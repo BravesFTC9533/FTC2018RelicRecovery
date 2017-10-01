@@ -51,7 +51,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Spano_TeleOp", group="Pushbot")
+@TeleOp(name="Spano_TeleOp", group="Arnold_v1")
 @Disabled
 public class TeleopTank_Spano extends OpMode{
 
@@ -105,28 +105,28 @@ public class TeleopTank_Spano extends OpMode{
         robot.motorRight.setPower(right*0.5);
 
         // Use gamepad left & right Bumpers to open and close the claw
-        if (gamepad1.right_bumper)
-            clawOffset += CLAW_SPEED;
-        else if (gamepad1.left_bumper)
-            clawOffset -= CLAW_SPEED;
+        //if (gamepad1.right_bumper)
+        //    clawOffset += CLAW_SPEED;
+        //else if (gamepad1.left_bumper)
+        //    clawOffset -= CLAW_SPEED;
 
         // Move both servos to new position.  Assume servos are mirror image of each other.
-        clawOffset = Range.clip(clawOffset, -0.5, 0.5);
-        robot.leftClaw.setPosition(robot.MID_SERVO + clawOffset);
-        robot.rightClaw.setPosition(robot.MID_SERVO - clawOffset);
+        //clawOffset = Range.clip(clawOffset, -0.5, 0.5);
+        //robot.leftClaw.setPosition(robot.MID_SERVO + clawOffset);
+        //robot.rightClaw.setPosition(robot.MID_SERVO - clawOffset);
 
         // Use gamepad buttons to move the arm up (Y) and down (A)
-        if (gamepad1.y)
-            robot.leftArm.setPower(robot.ARM_UP_POWER);
-        else if (gamepad1.a)
-            robot.leftArm.setPower(robot.ARM_DOWN_POWER);
-        else
-            robot.leftArm.setPower(0.0);
+        //if (gamepad1.y)
+        //    robot.leftArm.setPower(robot.ARM_UP_POWER);
+        //else if (gamepad1.a)
+        //    robot.leftArm.setPower(robot.ARM_DOWN_POWER);
+        //else
+        //    robot.leftArm.setPower(0.0);
 
         // Send telemetry message to signify robot running;
-        telemetry.addData("claw",  "Offset = %.2f", clawOffset);
-        telemetry.addData("left",  "%.2f", left);
-        telemetry.addData("right", "%.2f", right);
+        //telemetry.addData("claw",  "Offset = %.2f", clawOffset);
+        //telemetry.addData("left",  "%.2f", left);
+        //telemetry.addData("right", "%.2f", right);
     }
 
     /*
