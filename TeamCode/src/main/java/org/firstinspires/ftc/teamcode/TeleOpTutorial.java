@@ -6,7 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
- * Created by 9533 on 9/21/2017.
+ * Created by Brave-inators Team #9533 on 9/21/2017.
+ * Go Braves!!
  */
 
 @TeleOp(name = "TeleOp Tutorial", group = "Tutorials")
