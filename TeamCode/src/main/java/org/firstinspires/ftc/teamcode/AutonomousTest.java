@@ -5,12 +5,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import static java.lang.Thread.sleep;
+
 /**
  * Created by 9533 on 9/30/2017.
  */
 
 @Autonomous(name = "AutonomousTest", group = "Tests")
 public class AutonomousTest extends LinearOpMode{
+
     ElapsedTime runtime = new ElapsedTime();
 
     private DcMotor motorRight;
@@ -20,17 +23,31 @@ public class AutonomousTest extends LinearOpMode{
         motorRight = hardwareMap.dcMotor.get("motorRight");
         motorLeft = hardwareMap.dcMotor.get("motorLeft");
 
+        stopDriving();
+
         waitForStart();
         runtime.reset();
 
-        driveForwardForTime(0.5, 500);
+        driveForwardForTime(0.2, 200);
         sleep(3000);
-        driveForwardForTime(-0.5, 500);
+        driveForwardForTime(-0.2, 200);
         sleep(3000);
-        turnRight(0.5);
-        driveForwardForTime(0.5, 1500);
+        turnRight(0.3);
+        sleep(2000);
+        driveForwardForTime(0.5, 200);
         stopDriving();
-        turnLeft(0.4);
+        sleep(3000);
+        turnLeft(0.3);
+        driveForwardForTime(0.5, 50);
+        sleep(2000);
+        driveForwardForTime(-0.5, 100);
+        turnRight(0.9);
+        driveForwardForTime(0.5, 300);
+        stopDriving();
+        driveForwardForTime(-0.5, 300);
+        turnLeft(0.1);
+        driveForwardForTime(0.5, 700);
+        stopDriving();
 
     }
 
