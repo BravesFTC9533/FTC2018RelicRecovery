@@ -24,14 +24,14 @@ public class AutonomousTest extends LinearOpMode{
 
     private Servo colorServo;
 
+private static final double COLOR_RETRACTED_POSITION = 1;
+private static final double COLOR_EXTENDED_POSITION = 0.4;
+
     public void runOpMode() throws InterruptedException {
         motorRight = hardwareMap.dcMotor.get("motorRight");
         motorLeft = hardwareMap.dcMotor.get("motorLeft");
 
         colorServo = hardwareMap.servo.get("colorServo");
-
-        final double COLOR_RETRACTED_POSITION = 1;
-        final double COLOR_EXTENDED_POSITION = 0.4;
 
         //colorServo.scaleRange(0, 1);
         colorServo.setPosition(COLOR_RETRACTED_POSITION);
@@ -43,11 +43,13 @@ public class AutonomousTest extends LinearOpMode{
 
         colorServo.setPosition(COLOR_EXTENDED_POSITION);
         sleep(5000);
-        colorServo.setPosition(-0.4);
+        colorServo.setPosition(COLOR_RETRACTED_POSITION);
+        sleep (3000);
 
     }
 
-    void driveForwardForTime(double power, long time){
+
+   void driveForwardForTime(double power, long time){
         motorRight.setPower(power);
         motorLeft.setPower(power);
         sleep(time);
