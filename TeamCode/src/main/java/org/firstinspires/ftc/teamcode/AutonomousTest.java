@@ -1,18 +1,23 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.app.Activity;
 import android.graphics.Color;
+import android.view.View;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import static java.lang.Thread.sleep;
 
-/**
- * Created by 9533 on 9/30/2017.
- */
+//Created by 9533 on 9/30/2017
 
 @Autonomous(name = "AutonomousTest", group = "Tests")
 public class AutonomousTest extends LinearOpMode{
@@ -42,9 +47,9 @@ private static final double COLOR_EXTENDED_POSITION = 0.4;
         runtime.reset();
 
         colorServo.setPosition(COLOR_EXTENDED_POSITION);
-        sleep(5000);
+        sleep(2000);
         colorServo.setPosition(COLOR_RETRACTED_POSITION);
-        sleep (3000);
+        sleep (2000);
 
     }
 
