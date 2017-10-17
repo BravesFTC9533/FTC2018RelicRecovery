@@ -1,27 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.view.View;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import org.firstinspires.ftc.teamcode.RevColorSensor;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import static java.lang.Thread.sleep;
 
 //Created by 9533 on 9/30/2017
 
 
-@Autonomous(name = "AutonomousRED", group = "Tests")
-public class AutonomousTest extends LinearOpMode{
+@Autonomous(name = "AutonomousBLUE", group = "Tests")
+public class AutonomousBLUE extends LinearOpMode{
 
     ElapsedTime runtime = new ElapsedTime();
 
@@ -32,7 +22,7 @@ public class AutonomousTest extends LinearOpMode{
 
     ColorSensor colorSensor;
 
-    boolean isRed = false;
+    boolean isBlue = false;
 private static final double COLOR_RETRACTED_POSITION = 1;
 private static final double COLOR_EXTENDED_POSITION = 0.4;
 
@@ -58,12 +48,12 @@ private static final double COLOR_EXTENDED_POSITION = 0.4;
         telemetry.addData("Red  ", colorSensor.red());
         telemetry.addData("Green", colorSensor.green());
         telemetry.addData("Blue ", colorSensor.blue());
-        if(colorSensor.red() > 100){
-            isRed = true;
+        if(colorSensor.blue() > 100){
+            isBlue = true;
         } else {
-            isRed = false;
+            isBlue = false;
         }
-        if(isRed){
+        if(isBlue){
             driveForwardForTime(1, 75);
             stopDriving();
             colorServo.setPosition(COLOR_RETRACTED_POSITION);
