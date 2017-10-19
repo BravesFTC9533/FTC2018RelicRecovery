@@ -48,25 +48,23 @@ private static final double COLOR_EXTENDED_POSITION = 0.4;
         telemetry.addData("Red  ", colorSensor.red());
         telemetry.addData("Green", colorSensor.green());
         telemetry.addData("Blue ", colorSensor.blue());
-        if(colorSensor.blue() > 100){
+        if(colorSensor.red() < 30){
             isBlue = true;
         } else {
             isBlue = false;
         }
         if(isBlue){
-            driveForwardForTime(1, 75);
+            driveForwardForTime(1, 50);
             stopDriving();
             colorServo.setPosition(COLOR_RETRACTED_POSITION);
         }else {
-            driveForwardForTime(-1, 75);
+            driveForwardForTime(-1, 50);
             stopDriving();
-            sleep (2000);
+            colorServo.setPosition(COLOR_RETRACTED_POSITION);
         }
-        colorServo.setPosition(COLOR_RETRACTED_POSITION);
-        sleep (2000);
+        //colorServo.setPosition(COLOR_RETRACTED_POSITION);
 
     }
-
 
    void driveForwardForTime(double power, long time){
         motorRight.setPower(power);

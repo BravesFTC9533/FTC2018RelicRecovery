@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import org.firstinspires.ftc.teamcode.RevColorSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.ConceptVuMarkIdentification;
 
 import static java.lang.Thread.sleep;
 
@@ -21,7 +22,7 @@ import static java.lang.Thread.sleep;
 
 
 @Autonomous(name = "AutonomousRED", group = "Tests")
-public class AutonomousTest extends LinearOpMode{
+public class AutonomousRED extends LinearOpMode{
 
     ElapsedTime runtime = new ElapsedTime();
 
@@ -31,8 +32,10 @@ public class AutonomousTest extends LinearOpMode{
     private Servo colorServo;
 
     ColorSensor colorSensor;
-
     boolean isRed = false;
+
+    ConceptVuMarkIdentification vuMarkIdentification;
+
 private static final double COLOR_RETRACTED_POSITION = 1;
 private static final double COLOR_EXTENDED_POSITION = 0.4;
 
@@ -51,29 +54,35 @@ private static final double COLOR_EXTENDED_POSITION = 0.4;
 
         waitForStart();
         runtime.reset();
-
+        String shelfLocation = vuMarkIdentification.vuforia.toString();
+        if(shelfLocation.equals("CENTER")){
+            colorServo.setPosition(COLOR_EXTENDED_POSITION);
+            colorServo.setPosition(COLOR_RETRACTED_POSITION);
+        }
+        else {
+            return;
+        }
         colorServo.setPosition(COLOR_EXTENDED_POSITION);
         sleep(2000);
         telemetry.addData("Alpha", colorSensor.alpha());
         telemetry.addData("Red  ", colorSensor.red());
         telemetry.addData("Green", colorSensor.green());
         telemetry.addData("Blue ", colorSensor.blue());
-        if(colorSensor.red() > 100){
+        if(colorSensor.red() > 45){
             isRed = true;
         } else {
             isRed = false;
         }
         if(isRed){
-            driveForwardForTime(1, 75);
+            driveForwardForTime(1, 50);
             stopDriving();
             colorServo.setPosition(COLOR_RETRACTED_POSITION);
         }else {
-            driveForwardForTime(-1, 75);
+            driveForwardForTime(-1, 50);
             stopDriving();
-            sleep (2000);
+            colorServo.setPosition(COLOR_RETRACTED_POSITION);
         }
-        colorServo.setPosition(COLOR_RETRACTED_POSITION);
-        sleep (2000);
+        //colorServo.setPosition(COLOR_RETRACTED_POSITION);
 
     }
 
