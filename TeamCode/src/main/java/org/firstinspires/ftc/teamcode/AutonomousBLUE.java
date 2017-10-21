@@ -42,6 +42,7 @@ private static final double COLOR_EXTENDED_POSITION = 0.4;
         waitForStart();
         runtime.reset();
 
+        //START AUTNOMOUS BLUE
         colorServo.setPosition(COLOR_EXTENDED_POSITION);
         sleep(2000);
         telemetry.addData("Alpha", colorSensor.alpha());
@@ -49,21 +50,24 @@ private static final double COLOR_EXTENDED_POSITION = 0.4;
         telemetry.addData("Green", colorSensor.green());
         telemetry.addData("Blue ", colorSensor.blue());
         if(colorSensor.red() < 30){
-            isBlue = true;
+            motorRight.setPower(1);
+            sleep(100);
+            stopDriving();
+            colorServo.setPosition(COLOR_RETRACTED_POSITION);
+            sleep(50);
+            motorRight.setPower(-1);
+            sleep(100);
+            stopDriving();
         } else {
-            isBlue = false;
-        }
-        if(isBlue){
-            driveForwardForTime(1, 50);
+            motorLeft.setPower(1);
+            sleep(100);
             stopDriving();
             colorServo.setPosition(COLOR_RETRACTED_POSITION);
-        }else {
-            driveForwardForTime(-1, 50);
+            sleep(50);
+            motorLeft.setPower(-1);
+            sleep(100);
             stopDriving();
-            colorServo.setPosition(COLOR_RETRACTED_POSITION);
         }
-        //colorServo.setPosition(COLOR_RETRACTED_POSITION);
-
     }
 
    void driveForwardForTime(double power, long time){
