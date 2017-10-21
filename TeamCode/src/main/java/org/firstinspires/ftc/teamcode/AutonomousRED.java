@@ -1,32 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.view.View;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import org.firstinspires.ftc.teamcode.RevColorSensor;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.ConceptVuMarkIdentification;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.ConceptVuforiaNavigation;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuMarkInstanceId;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -34,6 +17,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
+
+import java.util.Locale;
 
 import static com.sun.tools.javac.util.Constants.format;
 import static java.lang.Thread.sleep;
@@ -86,8 +71,38 @@ public class AutonomousRED extends LinearOpMode{
     ColorSensor colorSensor;
     boolean isRed = false;
 
+
+    boolean performKnockOffJewel = true;
+
+    enum ColorSensed {
+        RED,
+        BLUE,
+        NONE
+    }
+
+    enum TeamColor {
+        RED,
+        BLUE
+    }
+
+
+    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 3.5 ;     // For figuring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double     DRIVE_SPEED             = 0.6;
+    static final double     TURN_SPEED              = 0.5;
+
+    private int COLOR_SENSOR_RED_THRESHOLD = 50;
+    private int COLOR_SENSOR_BLUE_THRESHOLD = 40;
+
+
     private static final double COLOR_RETRACTED_POSITION = 1;
     private static final double COLOR_EXTENDED_POSITION = 0.4;
+    RelicRecoveryVuMark vuMark = null;
+    VuforiaTrackable relicTemplate = null;
+
 
     public void runOpMode() throws InterruptedException {
 
@@ -95,19 +110,86 @@ public class AutonomousRED extends LinearOpMode{
         motorRight = hardwareMap.dcMotor.get("motorRight");
         motorLeft = hardwareMap.dcMotor.get("motorLeft");
 
+        motorLeft.setDirection(DcMotor.Direction.REVERSE);
+
+
         colorServo = hardwareMap.servo.get("colorServo");
 
         colorSensor = hardwareMap.colorSensor.get("colorSensor");
 
-        //colorServo.scaleRange(0, 1);
 
 
         stopDriving();
 
-        waitForStart();
-        runtime.reset();
-        colorServo.setPosition(COLOR_RETRACTED_POSITION);
+        initVuforia();
 
+        telemetry.addData(">", "Press Play to start");
+        telemetry.update();
+
+
+
+
+        waitForStart();
+
+        runtime.reset();
+
+
+        boolean test = true;
+
+        if(test == false) {
+            runProgram();
+
+        } else {
+
+
+            addTelemetry("About to drive forward");
+            double inches = 45.0;
+            double timeoutS = 10.0;
+            encoderDrive(0.5, inches, inches, timeoutS);
+
+        }
+
+
+
+
+        stopDriving();
+    }
+
+
+    void runProgram() {
+        addTelemetry("Extending arm");
+        extendColorArm();
+        waitForTick(1000);
+        if(opModeIsActive() == false) {
+            return;
+        }
+
+
+        addTelemetry("Detecting VuMark");
+        detectVuMark();
+        waitForTick(1000);
+        if(opModeIsActive() == false) {
+            return;
+        }
+
+        addTelemetry("Knock off jewel");
+        if(performKnockOffJewel && opModeIsActive()) {
+            knockOffJewel();
+        }
+        waitForTick(1000);
+        if(opModeIsActive() == false) {
+            return;
+        }
+    }
+
+
+    void addTelemetry(String data) {
+        telemetry.addData(data, "");
+        telemetry.update();
+    }
+
+
+    void initVuforia() {
         //__________________________________VUFORIA CODE________________________________________________
 
         /*
@@ -149,16 +231,16 @@ public class AutonomousRED extends LinearOpMode{
          * @see VuMarkInstanceId
          */
         VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
-        VuforiaTrackable relicTemplate = relicTrackables.get(0);
+        relicTemplate = relicTrackables.get(0);
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
-        telemetry.addData(">", "Press Play to start");
-        telemetry.update();
-        waitForStart();
 
         relicTrackables.activate();
 
-        while (opModeIsActive()) {
+    }
+
+    void detectVuMark() {
+        while (opModeIsActive() && runtime.seconds() < 30) {
 
             /**
              * See if any of the instances of {@link relicTemplate} are currently visible.
@@ -166,80 +248,114 @@ public class AutonomousRED extends LinearOpMode{
              * UNKNOWN, LEFT, CENTER, and RIGHT. When a VuMark is visible, something other than
              * UNKNOWN will be returned by {@link RelicRecoveryVuMark#from(VuforiaTrackable)}.
              */
-            RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+            vuMark = RelicRecoveryVuMark.from(relicTemplate);
             if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
 
                 /* Found an instance of the template. In the actual game, you will probably
                  * loop until this condition occurs, then move on to act accordingly depending
                  * on which VuMark was visible. */
                 telemetry.addData("VuMark", "%s visible", vuMark);
-                //break;
-                /* For fun, we also exhibit the navigational pose. In the Relic Recovery game,
-                 * it is perhaps unlikely that you will actually need to act on this pose information, but
-                 * we illustrate it nevertheless, for completeness. */
-                //OpenGLMatrix pose = ((VuforiaTrackableDefaultListener)relicTemplate.getListener()).getPose();
-                //telemetry.addData("Pose", format(pose));
 
-                /* We further illustrate how to decompose the pose into useful rotational and
-                 * translational components */
-//                if (pose != null) {
-//                    VectorF trans = pose.getTranslation();
-//                    Orientation rot = Orientation.getOrientation(pose, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-//
-//                    // Extract the X, Y, and Z components of the offset of the target relative to the robot
-//                    double tX = trans.get(0);
-//                    double tY = trans.get(1);
-//                    double tZ = trans.get(2);
-//
-//                    // Extract the rotational components of the target relative to the robot
-//                    double rX = rot.firstAngle;
-//                    double rY = rot.secondAngle;
-//                    double rZ = rot.thirdAngle;
-//                }
+                break;
             }
             else {
                 telemetry.addData("VuMark", "not visible");
-                telemetry.update();
-                sleep(5000);
-                break;
+
             }
 
             telemetry.update();
         }//while loop
 
-        //__________________________________VUFORIA CODE________________________________________________
+    }
 
-        //START AUTONOMOUS RED
+    double jewelMotorPower = 0.3;
+
+    void turnBotLeft() {
+
+        double leftMotorPower = -jewelMotorPower;
+        double rightMotorPower = jewelMotorPower;
+
+        moveBotForJewel(leftMotorPower, rightMotorPower);
+
+    }
+    void turnBotRight() {
+
+        double leftMotorPower = jewelMotorPower;
+        double rightMotorPower = -jewelMotorPower;
+
+        moveBotForJewel(leftMotorPower, rightMotorPower);
+    }
+    void moveBotForJewel(double left, double right) {
+        motorLeft.setPower(left);
+        motorRight.setPower(right);
+        waitForTick(100);
+
+        stopDriving();
+    }
+
+    void knockOffJewel() {
+        ColorSensed color = SenseJewel();
+        if(color == ColorSensed.RED) {
+            turnBotLeft();
+            retractColorArm();
+            turnBotRight();
+        } else if (color == ColorSensed.BLUE) {
+            turnBotRight();
+            retractColorArm();
+            turnBotLeft();
+        } else {
+
+            addTelemetry("Could not determine color");
+        }
+
+        retractColorArm();
+
+    }
+
+    void extendColorArm() {
         colorServo.setPosition(COLOR_EXTENDED_POSITION);
-        sleep(1000);
+        waitForTick(100);
+    }
+    void retractColorArm() {
+        colorServo.setPosition(COLOR_RETRACTED_POSITION);
+        waitForTick(500);
+    }
+
+    ColorSensed SenseJewel() {
+
         telemetry.addData("Alpha", colorSensor.alpha());
         telemetry.addData("Red  ", colorSensor.red());
         telemetry.addData("Green", colorSensor.green());
         telemetry.addData("Blue ", colorSensor.blue());
         telemetry.update();
-        if(colorSensor.red() > 45){
-            motorRight.setPower(1);
-            sleep(200);
-            stopDriving();
-            colorServo.setPosition(COLOR_RETRACTED_POSITION);
-            sleep(100);
-            motorRight.setPower(-1);
-            sleep(200);
-            stopDriving();
+
+        if(colorSensor.red() > COLOR_SENSOR_RED_THRESHOLD) {
+            return  ColorSensed.RED;
+        } else if (colorSensor.blue() > COLOR_SENSOR_BLUE_THRESHOLD ){
+            return ColorSensed.BLUE;
         } else {
-            motorLeft.setPower(1);
-            sleep(200);
-            stopDriving();
-            colorServo.setPosition(COLOR_RETRACTED_POSITION);
-            sleep(100);
-            motorLeft.setPower(-1);
-            sleep(200);
-            stopDriving();
+            return ColorSensed.NONE;
         }
     }
 
+    public void waitForTick(long periodMs) {
 
-   void driveForwardForTime(double power, long time){
+        // sleep for the remaining portion of the regular cycle period.
+        if ( opModeIsActive()) {
+            try {
+                Thread.sleep(periodMs);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        // Reset the cycle clock for the next pass.
+        //runtime.reset();
+    }
+
+
+
+    void driveForwardForTime(double power, long time){
         motorRight.setPower(power);
         motorLeft.setPower(-power);
         sleep(time);
@@ -263,5 +379,67 @@ public class AutonomousRED extends LinearOpMode{
     void stopDriving(){
         motorLeft.setPower(0);
         motorRight.setPower(0);
+    }
+
+    /*
+     *  Method to perfmorm a relative move, based on encoder counts.
+     *  Encoders are not reset as the move is based on the current position.
+     *  Move will stop if any of three conditions occur:
+     *  1) Move gets to the desired position
+     *  2) Move runs out of time
+     *  3) Driver stops the opmode running.
+     */
+    public void encoderDrive(double speed,
+                             double leftInches, double rightInches,
+                             double timeoutS) {
+        int newLeftTarget;
+        int newRightTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newLeftTarget = motorLeft.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            newRightTarget = motorRight.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            motorLeft.setTargetPosition(newLeftTarget);
+            motorRight.setTargetPosition(newRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            motorLeft.setPower(Math.abs(speed));
+            motorRight.setPower(Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (motorLeft.isBusy() && motorRight.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
+                telemetry.addData("Path2",  "Running at %7d :%7d",
+                        motorLeft.getCurrentPosition(),
+                        motorRight.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            motorLeft.setPower(0);
+            motorRight.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            //  sleep(250);   // optional pause after each move
+        }
     }
 }
