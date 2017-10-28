@@ -2,8 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.configuration.MotorConfiguration;
+import com.qualcomm.robotcore.hardware.configuration.MotorConfigurationType;
 
 /**
  * Created by dmill on 10/28/2017.
@@ -14,6 +17,8 @@ public class Robot {
 
     public DcMotor motorLeft = null;
     public DcMotor motorRight = null;
+
+
 
     public Servo colorServo = null;
     public ColorSensor colorSensor = null;
@@ -41,6 +46,9 @@ public class Robot {
 
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
+        motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         colorServo = hardwareMap.servo.get("colorServo");
         colorSensor = hardwareMap.colorSensor.get("colorSensor");
@@ -61,17 +69,20 @@ public class Robot {
         motorRight.setPower(right);
 
     }
-    public void setNewPosition(double leftInches, double rightInches) {
+    public void  setNewPosition(double leftInches, double rightInches) {
         int newLeftTarget;
         int newRightTarget;
 
+
+
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         newLeftTarget = motorLeft.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
         newRightTarget = motorRight.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
         motorLeft.setTargetPosition(newLeftTarget);
         motorRight.setTargetPosition(newRightTarget);
 
         // Turn On RUN_TO_POSITION
-        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public void setMode(DcMotor.RunMode mode) {

@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -11,8 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
  * Created by dmill on 10/28/2017.
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous", group = "Competition")
-public class Autonomous extends LinearOpMode {
+@Autonomous(name = "Autonomous", group = "Competition")
+public class Autonomous9533 extends LinearOpMode {
 
 
     Robot robot = null;
@@ -22,8 +24,16 @@ public class Autonomous extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        config = new Config(Config.Colors.RED, Config.Positions.FRONT, /*park*/ true, /*jewel*/ true, /*crypto*/ true);
-        config.Read();
+        config = new Config(hardwareMap.appContext);
+        config.Read(telemetry);
+
+        telemetry.addData("Color:", config.color.toString());
+        telemetry.addData("Position:", config.position.toString());
+        telemetry.addData("Park:", config.Park);
+        telemetry.addData("Jewel:", config.JewelKnockOff);
+        telemetry.addData("Crypto:", config.CryptoBox);
+        telemetry.update();
+
 
         robot = new Robot(hardwareMap);
         vuforiaHelper = new VuforiaHelper();
@@ -31,6 +41,29 @@ public class Autonomous extends LinearOpMode {
 
 
         waitForStart();
+
+
+        robot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        robot.setPower(1.0, 1.0);
+//
+//        ElapsedTime time = new ElapsedTime();
+//        while(opModeIsActive() && time.seconds() < 3) {
+//            idle();
+//        }
+//        robot.stop();
+
+
+        double inches = 45.0;
+        double timeoutS = 10.0;
+        encoderDrive(-0.5, inches, inches, timeoutS);
+
+        //runProgram();
+
+        while(opModeIsActive()) {
+            telemetry.addData("Finished.. idling", "");
+            idle();
+            readTelemetry();
+        }
 
         //addTelemetry("About to drive forward");
 
@@ -40,7 +73,7 @@ public class Autonomous extends LinearOpMode {
     void runProgram() {
 
         if(config.CryptoBox) {
-            detectVuMark();
+            //detectVuMark();
         }
 
         if(config.JewelKnockOff) {
@@ -58,6 +91,15 @@ public class Autonomous extends LinearOpMode {
     }
 
 
+    void readTelemetry() {
+
+        int right = robot.motorRight.getCurrentPosition();
+        int left = robot.motorLeft.getCurrentPosition();
+
+        telemetry.addData("Right", right);
+        telemetry.addData("Left", left);
+        telemetry.update();
+    }
     void detectVuMark() {
         ElapsedTime runtime = new ElapsedTime();
 
@@ -109,6 +151,7 @@ public class Autonomous extends LinearOpMode {
 
         ElapsedTime runtime = new ElapsedTime();
 
+        robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
@@ -117,7 +160,7 @@ public class Autonomous extends LinearOpMode {
 
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.setPower(Math.abs(speed), Math.abs(speed));
+            robot.setPower(speed, speed);
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
@@ -130,11 +173,13 @@ public class Autonomous extends LinearOpMode {
                     (robot.isBusy())) {
 
                 // Display it for the driver.
-//                telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
-//                telemetry.addData("Path2",  "Running at %7d :%7d",
-//                        motorLeft.getCurrentPosition(),
-//                        motorRight.getCurrentPosition());
-//                telemetry.update();
+                telemetry.addData("Path1",  "Running to %7d :%7d",
+                        robot.motorLeft.getTargetPosition(),
+                        robot.motorRight.getTargetPosition());
+                telemetry.addData("Path2",  "Running at %7d :%7d",
+                        robot.motorLeft.getCurrentPosition(),
+                        robot.motorRight.getCurrentPosition());
+                telemetry.update();
             }
 
             // Stop all motion;

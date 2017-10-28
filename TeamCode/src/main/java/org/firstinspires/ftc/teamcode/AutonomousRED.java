@@ -134,7 +134,7 @@ public class AutonomousRED extends LinearOpMode{
         runtime.reset();
 
 
-        boolean test = false;
+        boolean test = true;
 
         if(test == false) {
             runProgram();
