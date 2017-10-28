@@ -19,6 +19,11 @@ public class Robot {
     public ColorSensor colorSensor = null;
 
 
+
+
+    private static final double COLOR_RETRACTED_POSITION = 1;
+    private static final double COLOR_EXTENDED_POSITION = 0.4;
+
     static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 3.5 ;     // For figuring circumference
@@ -73,4 +78,17 @@ public class Robot {
         motorLeft.setMode(mode);
         motorRight.setMode(mode);
     }
+
+
+    public void extendColorArm() {
+        colorServo.setPosition(COLOR_EXTENDED_POSITION);
+
+    }
+    public void retractColorArm() {
+        colorServo.setPosition(COLOR_RETRACTED_POSITION);
+
+    }
+
+
+
 }

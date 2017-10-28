@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+
 /**
  * Created by dmill on 10/28/2017.
  */
@@ -13,6 +16,7 @@ public class Autonomous extends LinearOpMode {
 
 
     Robot robot = null;
+    VuforiaHelper vuforiaHelper = null;
 
 
 
@@ -20,10 +24,10 @@ public class Autonomous extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         robot = new Robot(hardwareMap);
+        vuforiaHelper = new VuforiaHelper();
+        vuforiaHelper.initVuforia(hardwareMap);
 
         waitForStart();
-
-
 
         //addTelemetry("About to drive forward");
         double inches = 45.0;
@@ -31,6 +35,41 @@ public class Autonomous extends LinearOpMode {
         encoderDrive(0.5, inches, inches, timeoutS);
 
     }
+
+
+    void detectVuMark() {
+        ElapsedTime runtime = new ElapsedTime();
+
+        while (opModeIsActive() && runtime.seconds() < 30) {
+
+            /**
+             * See if any of the instances of {@link relicTemplate} are currently visible.
+             * {@link RelicRecoveryVuMark} is an enum which can have the following values:
+             * UNKNOWN, LEFT, CENTER, and RIGHT. When a VuMark is visible, something other than
+             * UNKNOWN will be returned by {@link RelicRecoveryVuMark#from(VuforiaTrackable)}.
+             */
+            RelicRecoveryVuMark vuMark = vuforiaHelper.detectVuMark();
+
+
+            if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
+
+                /* Found an instance of the template. In the actual game, you will probably
+                 * loop until this condition occurs, then move on to act accordingly depending
+                 * on which VuMark was visible. */
+                telemetry.addData("VuMark", "%s visible", vuMark);
+
+                break;
+            }
+            else {
+                telemetry.addData("VuMark", "not visible");
+
+            }
+
+            telemetry.update();
+        }//while loop
+    }
+
+
 
 
     /*
