@@ -12,7 +12,7 @@ package org.firstinspires.ftc.teamcode;
 public class Config {
 
 
-    public void Save(){
+    public void Read(){
 
     }
 
