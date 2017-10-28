@@ -12,6 +12,19 @@ package org.firstinspires.ftc.teamcode;
 public class Config {
 
 
+    public Config() {
+
+    }
+
+    public Config(Config.Colors color, Config.Positions position, boolean park, boolean jewelKnockOff, boolean cryptoBox) {
+        this.color = color;
+        this.position = position;
+        this.Park = park;
+        this.JewelKnockOff = jewelKnockOff;
+        this.CryptoBox = cryptoBox;
+
+    }
+
     public void Read(){
 
     }
@@ -21,20 +34,16 @@ public class Config {
     }
 
 
-    public enum Color{
-        RED, BLUE
 
-
-
+    public enum Colors {
+        RED,
+        BLUE
 
     }
 
-    public enum Position{
-         FRONT,
+    public enum Positions {
+        FRONT,
         BACK
-
-
-
 
     }
 
@@ -42,6 +51,8 @@ public class Config {
     public boolean JewelKnockOff;
     public boolean CryptoBox;
 
+    public Colors color;
+    public Positions position;
 
 
 

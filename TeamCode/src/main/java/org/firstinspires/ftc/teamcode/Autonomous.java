@@ -17,23 +17,44 @@ public class Autonomous extends LinearOpMode {
 
     Robot robot = null;
     VuforiaHelper vuforiaHelper = null;
-
-
+    Config config = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
+
+        config = new Config(Config.Colors.RED, Config.Positions.FRONT, /*park*/ true, /*jewel*/ true, /*crypto*/ true);
+        config.Read();
 
         robot = new Robot(hardwareMap);
         vuforiaHelper = new VuforiaHelper();
         vuforiaHelper.initVuforia(hardwareMap);
 
+
         waitForStart();
 
         //addTelemetry("About to drive forward");
-        double inches = 45.0;
-        double timeoutS = 10.0;
-        encoderDrive(0.5, inches, inches, timeoutS);
 
+
+    }
+
+    void runProgram() {
+
+        if(config.CryptoBox) {
+            detectVuMark();
+        }
+
+        if(config.JewelKnockOff) {
+            // do jewel knock off
+
+        }
+
+        if(config.Park) {
+            // park robot
+            // drive forward 45 inches, taking no more than 10 seconds
+            double inches = 45.0;
+            double timeoutS = 10.0;
+            encoderDrive(0.5, inches, inches, timeoutS);
+        }
     }
 
 
