@@ -25,7 +25,7 @@ public class Autonomous9533 extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         config = new Config(hardwareMap.appContext);
-        config.Read(telemetry);
+        config.Read();
 
         telemetry.addData("Color:", config.color.toString());
         telemetry.addData("Position:", config.position.toString());

@@ -51,7 +51,7 @@ public class Config {
 
     }
 
-    public void Read(Telemetry telemetry){
+    public void Read(){
 
         try {
             File f = new File(context.getFilesDir(), fileName);
@@ -60,7 +60,7 @@ public class Config {
                 InputStream is = context.openFileInput(fileName);
                 String jsonTxt = convertStreamToString(is);
 
-                telemetry.addData("json:", jsonTxt);
+
 
                 JSONObject json = new JSONObject(jsonTxt);
 

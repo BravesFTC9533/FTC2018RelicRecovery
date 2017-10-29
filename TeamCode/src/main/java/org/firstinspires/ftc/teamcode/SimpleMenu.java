@@ -24,6 +24,21 @@ class Option
         this.name = name;
         this.choices = choices;
     }
+    public Option(String name, String[] choices, String initialChoice)
+    {
+        this.name = name;
+        this.choices = choices;
+
+        for(int i = 0;i<choices.length;i++){
+            if(choices[i] == initialChoice) {
+                this.choiceIndex = i;
+                break;
+            }
+        }
+
+    }
+
+
     public Option(String name, double max, double min, double inc)
     {
         this.name = name;
@@ -105,9 +120,33 @@ public class SimpleMenu {
         return options;
     }
 
-    public void addOption(String option, String[] choices) {
+    public void addOption(String option, String[] choices)
+    {
         this.options.add(new Option(option, choices));
     }
+
+    public void addOption(String option, String[] choices, String initialChoice)
+    {
+        this.options.add(new Option(option, choices, initialChoice));
+    }
+
+    public <T extends Enum<T>> void addOption(String option, Class<T> enumClass, T initialChoice) {
+
+        ArrayList<String> options = new ArrayList<>();
+
+        for(T constant : enumClass.getEnumConstants()) {
+            options.add(constant.toString());
+        }
+
+        this.options.add(new Option(option, options.toArray(new String[0]), initialChoice.toString()));
+
+    }
+
+    public void addBooleanOption(String option, boolean initialChoice)
+    {
+        this.options.add(new Option(option, new String[] { "YES", "NO"}, initialChoice ? "YES" : "NO"));
+    }
+
     public void addOption(String option, double max, double min, double inc)
     {
         this.options.add(new Option(option, max, min, inc));
