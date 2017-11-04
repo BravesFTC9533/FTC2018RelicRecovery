@@ -36,6 +36,8 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
             driverGamepad.update();
             operatorGamepad.update();
+
+            robotDrive.handle();
         }
 
         robot.stop();
