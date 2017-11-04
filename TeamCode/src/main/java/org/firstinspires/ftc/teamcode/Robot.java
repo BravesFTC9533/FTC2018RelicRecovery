@@ -24,6 +24,10 @@ public class Robot {
     public ColorSensor colorSensor = null;
 
 
+    public Servo blockGrabberLeft = null;
+    public Servo blockGrabberRight = null;
+
+
     public enum ColorSensed {
         RED,
         BLUE,
@@ -36,6 +40,15 @@ public class Robot {
 
     private static final double COLOR_RETRACTED_POSITION = 1;
     private static final double COLOR_EXTENDED_POSITION = 0.4;
+
+
+    private static final double GRABBER_LEFT_OPEN_POSITION = 0;
+    private static final double GRABBER_RIGHT_OPEN_POSITION = 0;
+
+    private static final double GRABBER_LEFT_CLOSE_POSITION = 0;
+    private static final double GRABBER_RIGHT_CLOSE_POSITION = 0;
+
+
 
     static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
@@ -60,6 +73,10 @@ public class Robot {
 
         colorServo = hardwareMap.servo.get("colorServo");
         colorSensor = hardwareMap.colorSensor.get("colorSensor");
+
+
+        blockGrabberLeft = hardwareMap.servo.get("blockLeft");
+        blockGrabberRight = hardwareMap.servo.get("blockRight");
 
 
     }
@@ -103,18 +120,12 @@ public class Robot {
         colorServo.setPosition(COLOR_EXTENDED_POSITION);
 
     }
+
     public void retractColorArm() {
         colorServo.setPosition(COLOR_RETRACTED_POSITION);
 
     }
 
-
-    public void turnLeft() {
-
-    }
-    public void turnRight() {
-
-    }
 
     public ColorSensed SenseJewel() {
         if(colorSensor.red() > COLOR_SENSOR_RED_THRESHOLD) {
@@ -126,5 +137,22 @@ public class Robot {
         }
     }
 
+
+
+    public void GrabberOpen() {
+
+    }
+
+    public void GrabberClose() {
+
+    }
+
+    public void GrabberRaise() {
+
+    }
+
+    public void GrabberLower() {
+
+    }
 
 }
