@@ -24,7 +24,15 @@ public class Robot {
     public ColorSensor colorSensor = null;
 
 
+    public enum ColorSensed {
+        RED,
+        BLUE,
+        NONE
+    }
 
+
+    private static final int COLOR_SENSOR_RED_THRESHOLD = 50;
+    private static final int COLOR_SENSOR_BLUE_THRESHOLD = 40;
 
     private static final double COLOR_RETRACTED_POSITION = 1;
     private static final double COLOR_EXTENDED_POSITION = 0.4;
@@ -100,6 +108,23 @@ public class Robot {
 
     }
 
+
+    public void turnLeft() {
+
+    }
+    public void turnRight() {
+
+    }
+
+    public ColorSensed SenseJewel() {
+        if(colorSensor.red() > COLOR_SENSOR_RED_THRESHOLD) {
+            return  ColorSensed.RED;
+        } else if (colorSensor.blue() > COLOR_SENSOR_BLUE_THRESHOLD ){
+            return ColorSensed.BLUE;
+        } else {
+            return ColorSensed.NONE;
+        }
+    }
 
 
 }

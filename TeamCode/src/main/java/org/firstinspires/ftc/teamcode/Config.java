@@ -65,14 +65,16 @@ public class Config {
                 JSONObject json = new JSONObject(jsonTxt);
 
                 String c = json.getString("color");
-                if(c == "RED") {
+
+                if(c.equals("RED")) {
                     this.color = Colors.RED;
                 } else {
                     this.color = Colors.BLUE;
                 }
 
                 String p = json.getString("position");
-                if(p == "FRONT") {
+
+                if(p.equals("FRONT")) {
                     this.position = Positions.FRONT;
                 } else {
                     this.position = Positions.BACK;
