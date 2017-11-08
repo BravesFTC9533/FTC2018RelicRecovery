@@ -40,14 +40,16 @@ public class TeleOpTutorial extends LinearOpMode{
             motorLeft.setPower(-gamepad1.left_stick_y * 0.5);
             motorRight.setPower(-gamepad1.right_stick_y * 0.5);
             relicArmExtender.setPower(gamepad2.left_trigger * 0.5);
+            relicArmExtender.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             relicArmExtender.setPower(-gamepad2.right_trigger * 0.5);
-            if(gamepad2.left_bumper){
-                blockLeft.setPosition(1);
-                blockRight.setPosition(1);
+
+            if(gamepad2.left_bumper){//Open position
+                blockLeft.setPosition(0.4);
+                blockRight.setPosition(0.4);
             }
-            if(gamepad2.right_bumper){
+            if(gamepad2.right_bumper){//Close position
                 blockLeft.setPosition(0);
-                blockRight.setPosition(0);
+               blockRight.setPosition(1);
             }
             idle();
         }
