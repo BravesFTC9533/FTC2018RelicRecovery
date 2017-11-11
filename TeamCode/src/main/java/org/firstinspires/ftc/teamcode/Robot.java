@@ -18,6 +18,7 @@ public class Robot {
     public DcMotor motorLeft = null;
     public DcMotor motorRight = null;
 
+    public DcMotor relicArmExtender = null;
 
 
     public Servo colorServo = null;
@@ -65,10 +66,14 @@ public class Robot {
         motorRight = hardwareMap.dcMotor.get("motorRight");
         motorLeft = hardwareMap.dcMotor.get("motorLeft");
 
+
+        relicArmExtender = hardwareMap.dcMotor.get("relicArmExtender");
+
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
         motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        relicArmExtender.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         colorServo = hardwareMap.servo.get("colorServo");
@@ -79,11 +84,13 @@ public class Robot {
         blockGrabberRight = hardwareMap.servo.get("blockRight");
 
 
+
     }
 
     public void stop() {
         motorLeft.setPower(0);
         motorRight.setPower(0);
+        relicArmExtender.setPower(0);
     }
 
     public boolean isBusy() {
@@ -140,11 +147,19 @@ public class Robot {
 
 
     public void GrabberOpen() {
-
+        blockGrabberLeft.setPosition(0);
+        blockGrabberRight.setPosition(1);
     }
 
     public void GrabberClose() {
+        blockGrabberLeft.setPosition(1);
+        blockGrabberRight.setPosition(0);
 
+    }
+
+    public void GrabberStop() {
+        blockGrabberLeft.setPosition(0.5);
+        blockGrabberRight.setPosition(0.5);
     }
 
     public void GrabberRaise() {

@@ -65,15 +65,29 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 //                    if (pressed) {
 //                        driveMode = DriveMode.MECANUM_MODE;
 //                    }
+
+                if(pressed) {
+                    robot.GrabberClose();
+                } else {
+                    robot.GrabberStop();
+                }
                 break;
 
             case FtcGamePad.GAMEPAD_B:
 //                    if (pressed) {
 //                        driveMode = DriveMode.TANK_MODE;
 //                    }
+                if(pressed) {
+                    robot.GrabberOpen();
+                } else {
+                    robot.GrabberStop();
+                }
                 break;
 
             case FtcGamePad.GAMEPAD_X:
+                if(pressed) {
+                    //wind things up
+                }
                 break;
 
             case FtcGamePad.GAMEPAD_Y:
@@ -98,6 +112,12 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
         {
             case FtcGamePad.GAMEPAD_A:
 
+                if(pressed) {
+                    robot.relicArmExtender.setPower(0.3);
+                } else {
+                    robot.stop();
+                }
+
                 //shooter.fireOneShot();
 //                    if (pressed) {
 //                        driveMode = DriveMode.MECANUM_MODE;
@@ -105,15 +125,30 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
                 break;
 
             case FtcGamePad.GAMEPAD_B:
+                if(pressed) {
+                    robot.relicArmExtender.setPower(0.5);
+                } else {
+                    robot.stop();
+                }
 //                    if (pressed) {
 //                        driveMode = DriveMode.TANK_MODE;
 //                    }
                 break;
 
             case FtcGamePad.GAMEPAD_X:
+                if(pressed) {
+                    robot.relicArmExtender.setPower(-0.3);
+                } else {
+                    robot.stop();
+                }
                 break;
 
             case FtcGamePad.GAMEPAD_Y:
+                if(pressed) {
+                    robot.relicArmExtender.setPower(-0.5);
+                } else {
+                    robot.stop();
+                }
                 break;
 
             case FtcGamePad.GAMEPAD_LBUMPER:
