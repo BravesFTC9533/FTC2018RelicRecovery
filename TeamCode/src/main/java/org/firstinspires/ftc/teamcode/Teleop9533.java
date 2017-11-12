@@ -30,6 +30,8 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
         telemetry.addData("Waiting for start..", "");
         telemetry.update();
+        robot.GrabberStart();
+        robot.retractColorArm();
         waitForStart();
 
         while(opModeIsActive()){
@@ -38,11 +40,22 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
             operatorGamepad.update();
 
             robotDrive.handle();
+
+            robot.handleLiftMotor(gamepad2);
+
+
+            telemetry.addData("Grabber L", "%.2f", robot.blockGrabberLeft.getPosition());
+            telemetry.addData("Grabber R", "%.2f", robot.blockGrabberRight.getPosition());
+            telemetry.update();
         }
 
         robot.stop();
 
     }
+
+
+
+
 
     @Override
     public void gamepadButtonEvent(FtcGamePad gamepad, int button, boolean pressed) {
@@ -61,27 +74,10 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
         {
             case FtcGamePad.GAMEPAD_A:
 
-                //shooter.fireOneShot();
-//                    if (pressed) {
-//                        driveMode = DriveMode.MECANUM_MODE;
-//                    }
-
-                if(pressed) {
-                    robot.GrabberClose();
-                } else {
-                    robot.GrabberStop();
-                }
                 break;
 
             case FtcGamePad.GAMEPAD_B:
-//                    if (pressed) {
-//                        driveMode = DriveMode.TANK_MODE;
-//                    }
-                if(pressed) {
-                    robot.GrabberOpen();
-                } else {
-                    robot.GrabberStop();
-                }
+
                 break;
 
             case FtcGamePad.GAMEPAD_X:
@@ -108,55 +104,47 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
     private void handleOperatorGamepad(FtcGamePad gamepad, int button, boolean pressed) {
 
+
         switch (button)
         {
-            case FtcGamePad.GAMEPAD_A:
-
-                if(pressed) {
-                    robot.relicArmExtender.setPower(0.3);
-                } else {
-                    robot.stop();
-                }
-
-                //shooter.fireOneShot();
-//                    if (pressed) {
-//                        driveMode = DriveMode.MECANUM_MODE;
-//                    }
-                break;
+//            case FtcGamePad.GAMEPAD_A:
+//
+//
+//
+//                if(pressed){
+//                    robot.GrabberLiftLower();
+//                } else {
+//                    robot.GrabberLiftStop();
+//                }
+//
+//                break;
 
             case FtcGamePad.GAMEPAD_B:
-                if(pressed) {
-                    robot.relicArmExtender.setPower(0.5);
-                } else {
-                    robot.stop();
-                }
-//                    if (pressed) {
-//                        driveMode = DriveMode.TANK_MODE;
-//                    }
                 break;
 
             case FtcGamePad.GAMEPAD_X:
-                if(pressed) {
-                    robot.relicArmExtender.setPower(-0.3);
-                } else {
-                    robot.stop();
-                }
                 break;
 
-            case FtcGamePad.GAMEPAD_Y:
-                if(pressed) {
-                    robot.relicArmExtender.setPower(-0.5);
-                } else {
-                    robot.stop();
-                }
-                break;
+//            case FtcGamePad.GAMEPAD_Y:
+//                if(pressed){
+//                    robot.GrabberLiftRaise();
+//                } else {
+//                    robot.GrabberLiftStop();
+//                }
+//                break;
 
             case FtcGamePad.GAMEPAD_LBUMPER:
-                //drivePowerScale = pressed? 0.5: 1.0;
+                if(pressed) {
+                     robot.GrabberOpen();
+                }
                 break;
 
             case FtcGamePad.GAMEPAD_RBUMPER:
-
+                if(pressed){
+                    robot.GrabberGrab();
+                } else {
+                    robot.GrabberLoose();
+                }
 
                 break;
         }
