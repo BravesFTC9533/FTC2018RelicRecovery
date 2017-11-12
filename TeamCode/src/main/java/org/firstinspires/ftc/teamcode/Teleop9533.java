@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -44,8 +46,9 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
             robot.handleLiftMotor(gamepad2);
 
 
-            telemetry.addData("Grabber L", "%.2f", robot.blockGrabberLeft.getPosition());
-            telemetry.addData("Grabber R", "%.2f", robot.blockGrabberRight.getPosition());
+            detectColor();
+//            telemetry.addData("Grabber L", "%.2f", robot.blockGrabberLeft.getPosition());
+//            telemetry.addData("Grabber R", "%.2f", robot.blockGrabberRight.getPosition());
             telemetry.update();
         }
 
@@ -54,6 +57,27 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
     }
 
 
+    void detectColor() {
+        float[] hsv = {0F, 0F, 0F};
+
+        int red = robot.colorSensor.red();
+        int green = robot.colorSensor.green();
+        int blue = robot.colorSensor.blue();
+
+        Color.RGBToHSV(red * 255, green * 255, blue * 255, hsv);
+
+        telemetry.addLine()
+                .addData("Red", "%d", red)
+                .addData("Green", "%d", green)
+                .addData("Blue", "%d", blue);
+
+        telemetry.addLine()
+                .addData("Hue", "%7f", red)
+                .addData("Sat", "%7f", green)
+                .addData("Val", "%7f", blue);
+
+
+    }
 
 
 
