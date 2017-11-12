@@ -72,9 +72,9 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
                 .addData("Blue", "%d", blue);
 
         telemetry.addLine()
-                .addData("Hue", "%7f", red)
-                .addData("Sat", "%7f", green)
-                .addData("Val", "%7f", blue);
+                .addData("Hue", "%7f", hsv[0])
+                .addData("Sat", "%7f", hsv[1])
+                .addData("Val", "%7f", hsv[2]);
 
 
     }
