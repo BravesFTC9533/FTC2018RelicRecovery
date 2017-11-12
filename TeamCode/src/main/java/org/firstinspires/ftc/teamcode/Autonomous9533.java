@@ -30,10 +30,11 @@ public class Autonomous9533 extends LinearOpMode {
 
     RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
 
-    private static final double distanceToCryptoBoxInchesFront = 33.0;
+    private static final double distanceToCryptoBoxInchesFront = 31.0;
     private static final double distanceToCryptoBoxInchesBack = 0.0;
     private static final double cryptoBoxWidth = 7.5;
 
+    private static final long pauseTimeBetweenSteps = 500;
 
     String currentStep = "";
 
@@ -67,16 +68,7 @@ public class Autonomous9533 extends LinearOpMode {
         waitForStart();
 
 
-
-
-
         runProgram();
-
-
-        while(opModeIsActive()) {
-            idle();
-            telemetry.update();
-        }
 
 
     }
@@ -88,10 +80,37 @@ public class Autonomous9533 extends LinearOpMode {
 
     void runProgram() {
 
+
+        robot.GrabberGrab();
+        waitForTick(500);
+        robot.GrabberLiftRaise();
+        waitForTick(1000);
+        robot.GrabberLiftStop();
+
+
+        double distanceForSensor = 1.5;
+        encoderDrive(0.2, distanceForSensor, distanceForSensor, 4);
+
+        // read pictograph
+        if(config.CryptoBox) {
+            updateStep("Detecting VuMark");
+            vuMark = detectVuMark(2.0);
+            vuMark = RelicRecoveryVuMark.LEFT;
+            if(vuMark == RelicRecoveryVuMark.CENTER) {
+                distanceToDrive += cryptoBoxWidth;
+            }
+            if(vuMark == RelicRecoveryVuMark.LEFT) {
+                distanceToDrive += cryptoBoxWidth*2;
+            }
+            updateStep("Finished detecting VuMark");
+        }
+
         if(config.JewelKnockOff) {
             updateStep("Knock off jewel");
             knockOffJewel();
+            updateStep("Finished knock off jewel");
         }
+        waitForTick(pauseTimeBetweenSteps);
 
         if(config.position == Config.Positions.FRONT) {
             runProgramFront();
@@ -131,15 +150,64 @@ public class Autonomous9533 extends LinearOpMode {
 
     void runProgramFront() {
 
-        // read pictograph
-        if(config.CryptoBox) {
-            vuMark = detectVuMark(5.0);
+        if(config.Park){
+            distanceToDrive+=distanceToCryptoBoxInchesFront;
+            updateStep("Doing Park maneuver");
+            encoderDrive(0.7, -distanceToDrive, -distanceToDrive, 7.0);
+            updateStep("Finished park maneuver");
         }
 
+        double turn90Inches = 12.5;
+        waitForTick(pauseTimeBetweenSteps);
+        updateStep("Turning 90 degrees");
+
+        encoderDrive(0.5, -turn90Inches, turn90Inches, 3.0);
+        updateStep("Finished turning 90 degrees");
+
+
+        waitForTick(pauseTimeBetweenSteps);
+        double placeBlockDistance = 15;
+        updateStep("Place block");
+        encoderDrive(0.5, placeBlockDistance, placeBlockDistance, 5.0);
+        updateStep("Finished Place block");
+
+
+
+        waitForTick(pauseTimeBetweenSteps);
+        updateStep("Lower block");
+        robot.GrabberLiftLower();
+        waitForTick(500);
+        robot.GrabberLiftStop();
+        updateStep("Finished lower block");
+
+
+        backUp(1.0);
+
+
+        waitForTick(pauseTimeBetweenSteps);
+        updateStep("Drop block");
+        robot.GrabberLoose();
+        updateStep("Finished drop block");
+
+
+        backUp(1.0);
+
+
     }
+
+
+    void backUp(double distance) {
+
+        waitForTick(pauseTimeBetweenSteps);
+        updateStep("Back up");
+        encoderDrive(0.5, -distance, -distance, 1.0);
+        updateStep("Finished Back up");
+    }
+
     void runProgramBack() {
 
     }
+
 
 
 
@@ -237,10 +305,10 @@ public class Autonomous9533 extends LinearOpMode {
 
 
                 // Display it for the driver.
-                telemetry.addLine().addData("Path1",  "Running to %7d :%7d",
+                telemetry.addLine().addData("Target",  "Running to %7d :%7d",
                         robot.motorLeft.getTargetPosition(),
                         robot.motorRight.getTargetPosition());
-                telemetry.addLine().addData("Path2",  "Running at %7d :%7d",
+                telemetry.addLine().addData("Current",  "Running at %7d :%7d",
                         robot.motorLeft.getCurrentPosition(),
                         robot.motorRight.getCurrentPosition());
                 telemetry.update();
@@ -263,9 +331,9 @@ public class Autonomous9533 extends LinearOpMode {
     void knockOffJewel() {
 
         double movement = 2.0; //how far to move in inches
-        double speed = 0.4; //how fast to move
+        double speed = 0.2; //how fast to move
         boolean moveForward = false;
-        double timeoutS = 3.0; //how long before timing out movement
+        double timeoutS = 2.0; //how long before timing out movement
 
 
 
@@ -295,14 +363,24 @@ public class Autonomous9533 extends LinearOpMode {
         if(moveForward == false) { //negate movement if moving backwards
             movement *= -1;
         }
+
+        double left = robot.motorLeft.getCurrentPosition();
+        double right = robot.motorRight.getCurrentPosition();
+
         updateStep("Moving to knock off jewel");
         encoderDrive(speed, movement, movement, timeoutS);
-        waitForTick(1000);
+
+        waitForTick(750);
         updateStep("Retracting Arm");
         robot.retractColorArm();
-        waitForTick(1000);
+        waitForTick(750);
         updateStep("Moving back to start");
-        encoderDrive(speed, -movement, -movement, timeoutS);
+
+        double moveLeft = (left - robot.motorLeft.getCurrentPosition()) / robot.COUNTS_PER_INCH;
+        double moveRight = (right - robot.motorRight.getCurrentPosition()) / robot.COUNTS_PER_INCH;
+
+        //encoderDrive(speed, -movement, -movement, timeoutS);
+        encoderDrive(speed, moveLeft, moveRight, timeoutS);
 
     }
 

@@ -3,8 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.configuration.MotorConfiguration;
 import com.qualcomm.robotcore.hardware.configuration.MotorConfigurationType;
 
@@ -18,8 +21,9 @@ public class Robot {
     public DcMotor motorLeft = null;
     public DcMotor motorRight = null;
 
-    public DcMotor relicArmExtender = null;
+    //public DcMotor relicArmExtender = null;
 
+    public DcMotor motorLift = null;
 
     public Servo colorServo = null;
     public ColorSensor colorSensor = null;
@@ -28,6 +32,7 @@ public class Robot {
     public Servo blockGrabberLeft = null;
     public Servo blockGrabberRight = null;
 
+    public DigitalChannel touchSensor = null;
 
     public enum ColorSensed {
         RED,
@@ -54,7 +59,7 @@ public class Robot {
     static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 3.5 ;     // For figuring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+    public static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     DRIVE_SPEED             = 0.6;
     static final double     TURN_SPEED              = 0.5;
@@ -65,15 +70,17 @@ public class Robot {
     public Robot(HardwareMap hardwareMap) {
         motorRight = hardwareMap.dcMotor.get("motorRight");
         motorLeft = hardwareMap.dcMotor.get("motorLeft");
+        //relicArmExtender = hardwareMap.dcMotor.get("relicArmExtender");
+        motorLift = hardwareMap.dcMotor.get("lift");
 
 
-        relicArmExtender = hardwareMap.dcMotor.get("relicArmExtender");
 
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
         motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        relicArmExtender.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //relicArmExtender.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         colorServo = hardwareMap.servo.get("colorServo");
@@ -84,13 +91,20 @@ public class Robot {
         blockGrabberRight = hardwareMap.servo.get("blockRight");
 
 
+        // get a reference to our digitalTouch object.
+        touchSensor = hardwareMap.get(DigitalChannel.class, "touch");
+
+        // set the digital channel to input.
+        touchSensor.setMode(DigitalChannel.Mode.INPUT);
+
 
     }
 
     public void stop() {
         motorLeft.setPower(0);
         motorRight.setPower(0);
-        relicArmExtender.setPower(0);
+        motorLift.setPower(0);
+        //relicArmExtender.setPower(0);
     }
 
     public boolean isBusy() {
@@ -107,7 +121,7 @@ public class Robot {
 
 
 
-        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         newLeftTarget = motorLeft.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
         newRightTarget = motorRight.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
         motorLeft.setTargetPosition(newLeftTarget);
@@ -146,28 +160,64 @@ public class Robot {
 
 
 
+    Pair<Double,Double> grab = new Pair<>(0.05, 0.90);
+    Pair<Double,Double> loose = new Pair<>(0.15, 0.80);
+    Pair<Double,Double> open = new Pair<>(0.30, 0.60);
+    Pair<Double,Double> start = new Pair<>(0.65, 0.25);
+
+    private void setGrabberPosition(Pair<Double,Double> pair) {
+        blockGrabberRight.setPosition(pair.getRight());
+        blockGrabberLeft.setPosition(pair.getLeft());
+    }
+
     public void GrabberOpen() {
-        blockGrabberLeft.setPosition(0);
-        blockGrabberRight.setPosition(1);
-    }
 
-    public void GrabberClose() {
-        blockGrabberLeft.setPosition(1);
-        blockGrabberRight.setPosition(0);
+        setGrabberPosition(open);
 
     }
 
-    public void GrabberStop() {
-        blockGrabberLeft.setPosition(0.5);
-        blockGrabberRight.setPosition(0.5);
-    }
+    public void GrabberLoose() {
 
-    public void GrabberRaise() {
+        setGrabberPosition(loose);
 
     }
+    public void GrabberGrab() {
 
-    public void GrabberLower() {
+        setGrabberPosition(grab);
 
+    }
+
+    public void GrabberStart() {
+        setGrabberPosition(start);
+    }
+
+
+    public void handleLiftMotor(Gamepad gamepad) {
+
+        if(gamepad.a) {
+            GrabberLiftLower();
+        } else if(gamepad.y){
+            GrabberLiftRaise();
+        } else {
+            GrabberLiftStop();
+        }
+
+    }
+
+    public void GrabberLiftRaise() {
+        motorLift.setPower(1);
+    }
+
+    public void GrabberLiftLower() {
+        // if the digital channel returns true it's HIGH and the button is unpressed.
+        if(touchSensor.getState() == true) {
+            motorLift.setPower(-1);
+        } else {
+            GrabberLiftStop();
+        }
+    }
+    public void GrabberLiftStop() {
+        motorLift.setPower(0);
     }
 
 }
