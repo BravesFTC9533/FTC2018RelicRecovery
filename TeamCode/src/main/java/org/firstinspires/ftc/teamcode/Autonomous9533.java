@@ -95,7 +95,7 @@ public class Autonomous9533 extends LinearOpMode {
         if(config.CryptoBox) {
             updateStep("Detecting VuMark");
             vuMark = detectVuMark(2.0);
-            vuMark = RelicRecoveryVuMark.LEFT;
+            
             if(vuMark == RelicRecoveryVuMark.CENTER) {
                 distanceToDrive += cryptoBoxWidth;
             }
