@@ -30,8 +30,12 @@ public class Autonomous9533 extends LinearOpMode {
 
     RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
 
-    private static final double distanceToCryptoBoxInchesFront = 31.0;
-    private static final double distanceToCryptoBoxInchesBack = 0.0;
+    private static final double distanceToCryptoBoxInchesFrontRed = 31.0;
+    private static final double distanceToCryptoBoxInchesFrontBlue = 18.0;
+
+    private static final double distanceToCryptoBoxInchesBackRed = 0.0;
+    private static final double distanceToCryptoBoxInchesBackBlue = 0.0;
+
     private static final double cryptoBoxWidth = 7.5;
 
     private static final long pauseTimeBetweenSteps = 1000;
@@ -149,7 +153,9 @@ public class Autonomous9533 extends LinearOpMode {
     void runProgramFront() {
 
         if(config.Park){
-            distanceToDrive+=distanceToCryptoBoxInchesFront;
+
+            distanceToDrive += (config.color == Config.Colors.RED) ? distanceToCryptoBoxInchesFrontRed : distanceToCryptoBoxInchesFrontBlue;
+
             updateStep("Doing Park maneuver");
 
             if(config.color == Config.Colors.RED) {
