@@ -32,9 +32,10 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
         telemetry.addData("Waiting for start..", "");
         telemetry.update();
-        robot.GrabberStart();
-        robot.retractColorArm();
+
         waitForStart();
+
+        robot.retractColorArm();
 
         while(opModeIsActive()){
 
@@ -46,13 +47,15 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
             robot.handleLiftMotor(gamepad2);
 
 
-            detectColor();
+            //detectColor();
 //            telemetry.addData("Grabber L", "%.2f", robot.blockGrabberLeft.getPosition());
 //            telemetry.addData("Grabber R", "%.2f", robot.blockGrabberRight.getPosition());
             telemetry.update();
         }
 
         robot.stop();
+
+
 
     }
 
@@ -105,9 +108,7 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
                 break;
 
             case FtcGamePad.GAMEPAD_X:
-                if(pressed) {
-                    //wind things up
-                }
+
                 break;
 
             case FtcGamePad.GAMEPAD_Y:
@@ -131,31 +132,14 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
         switch (button)
         {
-//            case FtcGamePad.GAMEPAD_A:
-//
-//
-//
-//                if(pressed){
-//                    robot.GrabberLiftLower();
-//                } else {
-//                    robot.GrabberLiftStop();
-//                }
-//
-//                break;
-
+            case FtcGamePad.GAMEPAD_A:
+                break;
             case FtcGamePad.GAMEPAD_B:
                 break;
-
             case FtcGamePad.GAMEPAD_X:
                 break;
-
-//            case FtcGamePad.GAMEPAD_Y:
-//                if(pressed){
-//                    robot.GrabberLiftRaise();
-//                } else {
-//                    robot.GrabberLiftStop();
-//                }
-//                break;
+            case FtcGamePad.GAMEPAD_Y:
+                break;
 
             case FtcGamePad.GAMEPAD_LBUMPER:
                 if(pressed) {

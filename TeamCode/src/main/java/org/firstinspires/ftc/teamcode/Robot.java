@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -149,13 +151,24 @@ public class Robot {
 
 
     public ColorSensed SenseJewel() {
-        if(colorSensor.red() > COLOR_SENSOR_RED_THRESHOLD) {
+
+        final double SCALE_FACTOR = 255;
+        float hsvValues[] = {0F, 0F, 0F};
+
+        Color.RGBToHSV((int) (colorSensor.red() * SCALE_FACTOR),
+                (int) (colorSensor.green() * SCALE_FACTOR),
+                (int) (colorSensor.blue() * SCALE_FACTOR),
+                hsvValues);
+        float hue = hsvValues[0];
+
+        if(hue < 10 || hue > 340) {
             return  ColorSensed.RED;
-        } else if (colorSensor.blue() > COLOR_SENSOR_BLUE_THRESHOLD ){
+        } else if(hue > 180 && hue < 240) {
             return ColorSensed.BLUE;
         } else {
-            return ColorSensed.NONE;
+            return  ColorSensed.NONE;
         }
+
     }
 
 

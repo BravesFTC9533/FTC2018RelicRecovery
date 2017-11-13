@@ -30,7 +30,7 @@ public class Autonomous9533 extends LinearOpMode {
 
     RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
 
-    private static final double distanceToCryptoBoxInchesFrontRed = 31.0;
+    private static final double distanceToCryptoBoxInchesFrontRed = 32.5;
     private static final double distanceToCryptoBoxInchesFrontBlue = 18.0;
 
     private static final double distanceToCryptoBoxInchesBackRed = 0.0;
@@ -38,7 +38,10 @@ public class Autonomous9533 extends LinearOpMode {
 
     private static final double cryptoBoxWidth = 7.5;
 
-    private static final long pauseTimeBetweenSteps = 1000;
+    private static final long pauseTimeBetweenSteps = 250;
+
+
+    private static final double speed = 0.5;
 
     String currentStep = "";
 
@@ -71,8 +74,12 @@ public class Autonomous9533 extends LinearOpMode {
         composeTelemetry();
         waitForStart();
 
-
         runProgram();
+
+        if(opModeIsActive()) {
+            robot.GrabberStart();
+            robot.retractColorArm();
+        }
 
 
     }
@@ -126,7 +133,7 @@ public class Autonomous9533 extends LinearOpMode {
             robot.GrabberLiftStop();
 
             //move into position to sense jewel color
-            double distanceForSensor = 1.5;
+            double distanceForSensor = 2.0;
             encoderDrive(0.2, distanceForSensor, distanceForSensor, 4, true);
 
 
@@ -163,7 +170,7 @@ public class Autonomous9533 extends LinearOpMode {
                 distanceToDrive = -distanceToDrive;
             }
 
-            encoderDrive(0.7, distanceToDrive, distanceToDrive, 7.0);
+            encoderDrive(speed, distanceToDrive, distanceToDrive, 7.0);
             updateStep("Finished park maneuver");
 
             waitForTick(pauseTimeBetweenSteps);
@@ -172,14 +179,14 @@ public class Autonomous9533 extends LinearOpMode {
 
             updateStep("Turning 90 degrees");
 
-            encoderDrive(0.5, -turn90Inches, turn90Inches, 3.0);
+            encoderDrive(speed, -turn90Inches, turn90Inches, 3.0);
             updateStep("Finished turning 90 degrees");
 
 
             waitForTick(pauseTimeBetweenSteps);
             double placeBlockDistance = 15;
             updateStep("Place block");
-            encoderDrive(0.5, placeBlockDistance, placeBlockDistance, 5.0);
+            encoderDrive(speed, placeBlockDistance, placeBlockDistance, 5.0);
             updateStep("Finished Place block");
         }
 
@@ -189,6 +196,7 @@ public class Autonomous9533 extends LinearOpMode {
         if(config.CryptoBox) {
 
 
+            backUp(1.0);
 
             waitForTick(pauseTimeBetweenSteps);
             updateStep("Lower block");
@@ -198,7 +206,7 @@ public class Autonomous9533 extends LinearOpMode {
             updateStep("Finished lower block");
 
 
-            backUp(1.0);
+            //backUp(1.0);
 
 
             waitForTick(pauseTimeBetweenSteps);
@@ -314,7 +322,7 @@ public class Autonomous9533 extends LinearOpMode {
 
 
                 if(currentSpeed < speed) {
-                    multiplier = Easing.Interpolate(runtime.seconds(), Easing.Functions.CubicEaseOut);
+                    multiplier = Easing.Interpolate(runtime.seconds() / 2, Easing.Functions.CubicEaseOut);
                     currentSpeed = speed * multiplier;
                 }
 
@@ -358,7 +366,7 @@ public class Autonomous9533 extends LinearOpMode {
         double movement = 2.0; //how far to move in inches
         double speed = 0.2; //how fast to move
         boolean moveForward = false;
-        double timeoutS = 2.0; //how long before timing out movement
+        double timeoutS = 4.0; //how long before timing out movement
 
 
 
@@ -401,11 +409,11 @@ public class Autonomous9533 extends LinearOpMode {
         waitForTick(750);
         updateStep("Moving back to start");
 
-        double moveLeft = (left - robot.motorLeft.getCurrentPosition()) / robot.COUNTS_PER_INCH;
-        double moveRight = (right - robot.motorRight.getCurrentPosition()) / robot.COUNTS_PER_INCH;
+//        double moveLeft = (left - robot.motorLeft.getCurrentPosition()) / robot.COUNTS_PER_INCH;
+//        double moveRight = (right - robot.motorRight.getCurrentPosition()) / robot.COUNTS_PER_INCH;
 
-        //encoderDrive(speed, -movement, -movement, timeoutS);
-        encoderDrive(speed, moveLeft, moveRight, timeoutS, true);
+        encoderDrive(speed, -movement, -movement, timeoutS, true);
+        //encoderDrive(speed, moveLeft, moveRight, timeoutS, true);
 
     }
 
