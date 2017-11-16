@@ -42,14 +42,6 @@ public class Config {
 
     }
 
-    public Config(Config.Colors color, Config.Positions position, boolean park, boolean jewelKnockOff, boolean cryptoBox) {
-        this.color = color;
-        this.position = position;
-        this.Park = park;
-        this.JewelKnockOff = jewelKnockOff;
-        this.CryptoBox = cryptoBox;
-
-    }
 
     public void Read(){
 
@@ -84,6 +76,33 @@ public class Config {
                 this.CryptoBox = json.getBoolean("crypto");
                 this.Park = json.getBoolean("park");
 
+                if(json.has("distanceToCryptoBoxInchesFrontRed")) {
+
+                    this.distanceToCryptoBoxInchesBackBlue = json.getDouble("distanceToCryptoBoxInchesBackBlue");
+                    this.distanceToCryptoBoxInchesBackRed = json.getDouble("distanceToCryptoBoxInchesBackRed");
+                    this.distanceToDriveOffBalanceBoardBack = json.getDouble("distanceToDriveOffBalanceBoardBack");
+
+                    this.distanceToCryptoBoxInchesFrontRed = json.getDouble("distanceToCryptoBoxInchesFrontRed");
+                    this.distanceToCryptoBoxInchesFrontBlue = json.getDouble("distanceToCryptoBoxInchesFrontBlue");
+
+                    this.delayStart = json.getDouble("delayStart");
+                    this.speed = json.getDouble("speed");
+
+                } else {
+                    //give default values
+                    this.distanceToCryptoBoxInchesFrontRed = 32.5;
+                    this.distanceToCryptoBoxInchesFrontBlue = 18.0;
+
+
+                    this.distanceToDriveOffBalanceBoardBack = 26.0;
+                    this.distanceToCryptoBoxInchesBackRed = 13.5;
+                    this.distanceToCryptoBoxInchesBackBlue = 13.0;
+
+                    this.delayStart = 0.0;
+                    this.speed = 0.5;
+
+                }
+
             }
         } catch (Exception ex) {
 
@@ -105,6 +124,16 @@ public class Config {
             obj.put("park", Park);
             obj.put("jewel", JewelKnockOff);
             obj.put("crypto", CryptoBox);
+
+            obj.put("distanceToCryptoBoxInchesBackBlue", this.distanceToCryptoBoxInchesBackBlue);
+            obj.put("distanceToCryptoBoxInchesBackRed", this.distanceToCryptoBoxInchesBackRed);
+            obj.put("distanceToDriveOffBalanceBoardBack", this.distanceToDriveOffBalanceBoardBack);
+            obj.put("distanceToCryptoBoxInchesFrontBlue", this.distanceToCryptoBoxInchesFrontBlue);
+            obj.put("distanceToCryptoBoxInchesFrontRed", this.distanceToCryptoBoxInchesFrontRed);
+
+            obj.put("delayStart", this.delayStart);
+            obj.put("speed", this.speed);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -150,8 +179,18 @@ public class Config {
 
 
 
+    public double distanceToCryptoBoxInchesFrontRed;
+    public double distanceToCryptoBoxInchesFrontBlue;
 
 
+    public double distanceToDriveOffBalanceBoardBack;
+    public double distanceToCryptoBoxInchesBackRed;
+    public double distanceToCryptoBoxInchesBackBlue;
+
+
+
+    public double delayStart;
+    public double speed;
 
 
 

@@ -36,21 +36,21 @@ public class AutonomousConfig extends LinearOpMode {
         menu.clearOptions();
 
         menu.addOption("Team", Config.Colors.class, config.color);
-        //menu.addOption("Team", new String[]{"RED", "BLUE"});
-
         menu.addOption("Position", Config.Positions.class, config.position);
-        //menu.addOption("Position", new String[]{"FRONT", "BACK"});
-
         menu.addBooleanOption("Park", config.Park);
-        //menu.addOption("Park", new String[]{"YES", "NO"});
-
         menu.addBooleanOption("Jewel Knockoff", config.JewelKnockOff);
-        //menu.addOption("Jewel Knockoff", new String[]{"YES", "NO"});
-
         menu.addBooleanOption("Place Cryptoblock", config.CryptoBox);
-        //menu.addOption("Place Cryptoblock", new String[]{"YES", "NO"});
 
-        //menu.addOption("Delay Start", 30, 0, 0.1);
+
+        menu.addOption("Front Red Distance", 40, 10, 0.5, config.distanceToCryptoBoxInchesFrontRed);
+        menu.addOption("Front Blue Distance", 40, 10, 0.5, config.distanceToCryptoBoxInchesFrontBlue);
+
+        menu.addOption("Back Red Distance", 20, 10, 0.5, config.distanceToCryptoBoxInchesBackRed);
+        menu.addOption("Back Blue Distance", 20, 10, 0.5, config.distanceToCryptoBoxInchesBackBlue);
+        menu.addOption("Back Balance Board Distance", 20, 30, 0.5, config.distanceToDriveOffBalanceBoardBack);
+
+        menu.addOption("Speed", 1, 0, 0.05, config.speed);
+        menu.addOption("Delay Start", 30, 0, 0.1, config.delayStart);
 
         menu.setGamepad(gamepad1);
         menu.setTelemetry(telemetry);
@@ -60,6 +60,14 @@ public class AutonomousConfig extends LinearOpMode {
         while (opModeIsActive()) {
 
             menu.displayMenu();
+
+            config.distanceToCryptoBoxInchesFrontRed  = Double.parseDouble(menu.getCurrentChoiceOf("Front Red Distance" ));
+            config.distanceToCryptoBoxInchesFrontBlue = Double.parseDouble(menu.getCurrentChoiceOf("Front Blue Distance"));
+            config.distanceToCryptoBoxInchesBackRed   = Double.parseDouble(menu.getCurrentChoiceOf("Back Red Distance"));
+            config.distanceToCryptoBoxInchesBackBlue  = Double.parseDouble(menu.getCurrentChoiceOf("Back Blue Distance"));
+            config.distanceToDriveOffBalanceBoardBack = Double.parseDouble(menu.getCurrentChoiceOf("Back Balance Board Distance"));
+            config.delayStart                         = Double.parseDouble(menu.getCurrentChoiceOf("Delay Start"));
+            config.speed                              = Double.parseDouble(menu.getCurrentChoiceOf("Speed"));
 
             switch (menu.getCurrentChoiceOf("Team")) {
                 case "RED":
@@ -120,6 +128,7 @@ public class AutonomousConfig extends LinearOpMode {
 //                    delayStartTime = 0;
 //                    break;
 //            }
+            sleep(50);
         }
 
         config.Write();

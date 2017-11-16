@@ -30,18 +30,9 @@ public class Autonomous9533 extends LinearOpMode {
 
     RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
 
-    private static final double distanceToCryptoBoxInchesFrontRed = 32.5;
-    private static final double distanceToCryptoBoxInchesFrontBlue = 18.0;
-
-    private static final double distanceToCryptoBoxInchesBackRed = 0.0;
-    private static final double distanceToCryptoBoxInchesBackBlue = 0.0;
-
     private static final double cryptoBoxWidth = 7.5;
-
     private static final long pauseTimeBetweenSteps = 250;
-
-
-    private static final double speed = 0.5;
+    private double speed = 0.5;
 
     String currentStep = "";
 
@@ -49,12 +40,18 @@ public class Autonomous9533 extends LinearOpMode {
     int leftPosition;
     int rightPosition;
 
+    enum TurnDirection {
+        CLOCKWISE,
+        COUNTERCLOCKWISE
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         config = new Config(hardwareMap.appContext);
         config.Read();
+
+        speed = config.speed;
 
         telemetry.addData("Color:", config.color.toString());
         telemetry.addData("Position:", config.position.toString());
@@ -119,6 +116,69 @@ public class Autonomous9533 extends LinearOpMode {
 
     }
 
+    void knockOffJewel() {
+
+        double movement = 2.0; //how far to move in inches
+        double speed = 0.2; //how fast to move
+        boolean moveForward = false;
+        double timeoutS = 4.0; //how long before timing out movement
+
+
+
+        updateStep("Extending Arm");
+        robot.extendColorArm();
+        waitForTick(1000);
+
+
+        updateStep("Sensing color");
+        Robot.ColorSensed color = robot.SenseJewel();
+
+        // always move towards the opposite of team color
+        if(color == Robot.ColorSensed.RED) {
+            moveForward = config.color == Config.Colors.BLUE;
+
+        } else if (color == Robot.ColorSensed.BLUE) {
+            moveForward = config.color == Config.Colors.RED;
+
+        } else {
+            updateStep("Retracting Arm - No color");
+            robot.retractColorArm();
+            waitForTick(1000);
+            return;
+        }
+
+
+        if(moveForward == false) { //negate movement if moving backwards
+            movement *= -1;
+        }
+
+        double left = robot.motorLeft.getCurrentPosition();
+        double right = robot.motorRight.getCurrentPosition();
+
+        updateStep("Moving to knock off jewel");
+        encoderDrive(speed, movement, movement, timeoutS, true);
+
+        waitForTick(750);
+        updateStep("Retracting Arm");
+        robot.retractColorArm();
+        waitForTick(750);
+        updateStep("Moving back to start");
+
+//        double moveLeft = (left - robot.motorLeft.getCurrentPosition()) / robot.COUNTS_PER_INCH;
+//        double moveRight = (right - robot.motorRight.getCurrentPosition()) / robot.COUNTS_PER_INCH;
+
+        encoderDrive(speed, -movement, -movement, timeoutS, true);
+        //encoderDrive(speed, moveLeft, moveRight, timeoutS, true);
+
+    }
+
+    void backUp(double distance) {
+
+        pause();
+        updateStep("Back up");
+        encoderDrive(0.5, -distance, -distance, 5.0);
+        updateStep("Finished Back up");
+    }
 
     void runProgram() {
 
@@ -136,10 +196,9 @@ public class Autonomous9533 extends LinearOpMode {
             double distanceForSensor = 2.0;
             encoderDrive(0.2, distanceForSensor, distanceForSensor, 4, true);
 
-
         }
 
-        waitForTick(pauseTimeBetweenSteps);
+        pause();
 
         if(config.JewelKnockOff) {
             updateStep("Knock off jewel");
@@ -147,7 +206,7 @@ public class Autonomous9533 extends LinearOpMode {
             updateStep("Finished knock off jewel");
         }
 
-        waitForTick(pauseTimeBetweenSteps);
+        pause();
 
         if(config.position == Config.Positions.FRONT) {
             runProgramFront();
@@ -157,81 +216,131 @@ public class Autonomous9533 extends LinearOpMode {
 
     }
 
-    void runProgramFront() {
+    void pause() {
+        waitForTick(pauseTimeBetweenSteps);
+    }
 
-        if(config.Park){
+    void turn90(TurnDirection direction) {
+        double turn90Inches = 12.5;
 
-            distanceToDrive += (config.color == Config.Colors.RED) ? distanceToCryptoBoxInchesFrontRed : distanceToCryptoBoxInchesFrontBlue;
+        if(direction == TurnDirection.CLOCKWISE) {
+            //maneuver build for counter-clockwise, so reverse
+            turn90Inches = -turn90Inches;
+        }
+        updateStep("Turning 90 degrees");
 
-            updateStep("Doing Park maneuver");
+        encoderDrive(speed, -turn90Inches, turn90Inches, 3.0);
+        updateStep("Finished turning 90 degrees");
+    }
 
-            if(config.color == Config.Colors.RED) {
-                //red has to drive backwards, so invert distance
-                distanceToDrive = -distanceToDrive;
-            }
+    void parkFromFront() {
+        distanceToDrive += (config.color == Config.Colors.RED) ? config.distanceToCryptoBoxInchesFrontRed : config.distanceToCryptoBoxInchesFrontBlue;
 
-            encoderDrive(speed, distanceToDrive, distanceToDrive, 7.0);
-            updateStep("Finished park maneuver");
+        updateStep("Doing Park maneuver");
 
-            waitForTick(pauseTimeBetweenSteps);
-
-            double turn90Inches = 12.5;
-
-            updateStep("Turning 90 degrees");
-
-            encoderDrive(speed, -turn90Inches, turn90Inches, 3.0);
-            updateStep("Finished turning 90 degrees");
-
-
-            waitForTick(pauseTimeBetweenSteps);
-            double placeBlockDistance = 15;
-            updateStep("Place block");
-            encoderDrive(speed, placeBlockDistance, placeBlockDistance, 5.0);
-            updateStep("Finished Place block");
+        if(config.color == Config.Colors.RED) {
+            //red has to drive backwards, so invert distance
+            distanceToDrive = -distanceToDrive;
         }
 
+        encoderDrive(speed, distanceToDrive, distanceToDrive, 7.0);
+        updateStep("Finished park maneuver");
 
+        pause();
 
+        turn90(TurnDirection.COUNTERCLOCKWISE);
 
-        if(config.CryptoBox) {
+        pause();
+        double placeBlockDistance = 15;
+        updateStep("Parking");
+        encoderDrive(speed, placeBlockDistance, placeBlockDistance, 5.0);
+        updateStep("Finished Parking");
+    }
 
+    void parkFromBack() {
 
-            backUp(1.0);
+        double distance = config.distanceToDriveOffBalanceBoardBack;
 
-            waitForTick(pauseTimeBetweenSteps);
-            updateStep("Lower block");
-            robot.GrabberLiftLower();
-            waitForTick(500);
-            robot.GrabberLiftStop();
-            updateStep("Finished lower block");
-
-
-            //backUp(1.0);
-
-
-            waitForTick(pauseTimeBetweenSteps);
-            updateStep("Drop block");
-            robot.GrabberLoose();
-            updateStep("Finished drop block");
-
-
-            backUp(1.0);
-
+        if(config.color == Config.Colors.RED) {
+            //red has to drive backwards, so invert distance
+            distance = -distance;
         }
+        updateStep("Driving off of balance board");
+        encoderDrive(speed, distance, distance, 7.0);
+        updateStep("Finished driving off of balance board");
+
+        pause();
+        turn90(TurnDirection.CLOCKWISE);
+
+        pause();
+
+        //move backwards to wall
+        double distanceToWall = 15.0; //this should be pretty static if not overkill for red
+        encoderDrive(speed, -distanceToWall, -distanceToWall, 5.0);
+        pause();
+
+        //move to correct position in front of crypto wall
+        double distanceToFirstBox = (config.color == Config.Colors.RED) ? config.distanceToCryptoBoxInchesBackRed : config.distanceToCryptoBoxInchesBackBlue;
+        distance = distanceToFirstBox + distanceToDrive;
+        encoderDrive(speed, distance, distance, 5.0);
+        pause();
+
+        TurnDirection dir = (config.color == Config.Colors.RED) ? TurnDirection.CLOCKWISE : TurnDirection.COUNTERCLOCKWISE;
+        turn90(dir);
+        pause();
+
+
+        double distanceIntoWall = 10.0;
+        encoderDrive(speed, distanceIntoWall, distanceIntoWall, 5.0);
+        pause();
+
 
     }
 
+    void dropCryptoblock() {
+        backUp(1.0);
 
-    void backUp(double distance) {
+        pause();
+        updateStep("Lower block");
+        robot.GrabberLiftLower();
+        waitForTick(500);
+        robot.GrabberLiftStop();
+        updateStep("Finished lower block");
 
-        waitForTick(pauseTimeBetweenSteps);
-        updateStep("Back up");
-        encoderDrive(0.5, -distance, -distance, 1.0);
-        updateStep("Finished Back up");
+
+        //backUp(1.0);
+
+
+        pause();
+        updateStep("Drop block");
+        robot.GrabberLoose();
+        updateStep("Finished drop block");
+
+
+        backUp(1.0);
+    }
+
+    void runProgramFront() {
+
+        if(config.Park){
+            parkFromFront();
+        }
+
+        if(config.CryptoBox) {
+            dropCryptoblock();
+        }
+
     }
 
     void runProgramBack() {
 
+        if(config.Park) {
+            parkFromBack();
+        }
+
+        if(config.CryptoBox) {
+            dropCryptoblock();
+        }
     }
 
 
@@ -361,61 +470,7 @@ public class Autonomous9533 extends LinearOpMode {
 
 
 
-    void knockOffJewel() {
 
-        double movement = 2.0; //how far to move in inches
-        double speed = 0.2; //how fast to move
-        boolean moveForward = false;
-        double timeoutS = 4.0; //how long before timing out movement
-
-
-
-        updateStep("Extending Arm");
-        robot.extendColorArm();
-        waitForTick(1000);
-
-
-        updateStep("Sensing color");
-        Robot.ColorSensed color = robot.SenseJewel();
-
-        // always move towards the opposite of team color
-        if(color == Robot.ColorSensed.RED) {
-            moveForward = config.color == Config.Colors.BLUE;
-
-        } else if (color == Robot.ColorSensed.BLUE) {
-            moveForward = config.color == Config.Colors.RED;
-
-        } else {
-            updateStep("Retracting Arm - No color");
-            robot.retractColorArm();
-            waitForTick(1000);
-            return;
-        }
-
-
-        if(moveForward == false) { //negate movement if moving backwards
-            movement *= -1;
-        }
-
-        double left = robot.motorLeft.getCurrentPosition();
-        double right = robot.motorRight.getCurrentPosition();
-
-        updateStep("Moving to knock off jewel");
-        encoderDrive(speed, movement, movement, timeoutS, true);
-
-        waitForTick(750);
-        updateStep("Retracting Arm");
-        robot.retractColorArm();
-        waitForTick(750);
-        updateStep("Moving back to start");
-
-//        double moveLeft = (left - robot.motorLeft.getCurrentPosition()) / robot.COUNTS_PER_INCH;
-//        double moveRight = (right - robot.motorRight.getCurrentPosition()) / robot.COUNTS_PER_INCH;
-
-        encoderDrive(speed, -movement, -movement, timeoutS, true);
-        //encoderDrive(speed, moveLeft, moveRight, timeoutS, true);
-
-    }
 
 
 
