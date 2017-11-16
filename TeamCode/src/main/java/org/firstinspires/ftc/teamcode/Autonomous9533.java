@@ -71,6 +71,14 @@ public class Autonomous9533 extends LinearOpMode {
         composeTelemetry();
         waitForStart();
 
+
+        if(config.delayStart > 0.0) {
+            ElapsedTime runtime = new ElapsedTime();
+            while(opModeIsActive() && runtime.seconds() < config.delayStart) {
+
+            }
+        }
+
         runProgram();
 
         if(opModeIsActive()) {
@@ -182,7 +190,7 @@ public class Autonomous9533 extends LinearOpMode {
 
     void runProgram() {
 
-        if(config.CryptoBox) {
+        if(config.CryptoBox && opModeIsActive()) {
             readPictograph();
 
             // grab block and lift
@@ -200,7 +208,7 @@ public class Autonomous9533 extends LinearOpMode {
 
         pause();
 
-        if(config.JewelKnockOff) {
+        if(config.JewelKnockOff && opModeIsActive()) {
             updateStep("Knock off jewel");
             knockOffJewel();
             updateStep("Finished knock off jewel");
@@ -307,10 +315,6 @@ public class Autonomous9533 extends LinearOpMode {
         robot.GrabberLiftStop();
         updateStep("Finished lower block");
 
-
-        //backUp(1.0);
-
-
         pause();
         updateStep("Drop block");
         robot.GrabberLoose();
@@ -322,11 +326,11 @@ public class Autonomous9533 extends LinearOpMode {
 
     void runProgramFront() {
 
-        if(config.Park){
+        if(config.Park && opModeIsActive()){
             parkFromFront();
         }
 
-        if(config.CryptoBox) {
+        if(config.CryptoBox && opModeIsActive()) {
             dropCryptoblock();
         }
 
