@@ -267,7 +267,7 @@ public class Autonomous9533 extends LinearOpMode {
 
     void parkFromBack() {
 
-        double distance = config.distanceToDriveOffBalanceBoardBack;
+        double distance = (config.color == Config.Colors.BLUE ) ? config.distanceToDriveOffBalanceBoardBackBlue : config.distanceToDriveOffBalanceBoardBackRed;
 
         if(config.color == Config.Colors.RED) {
             //red has to drive backwards, so invert distance

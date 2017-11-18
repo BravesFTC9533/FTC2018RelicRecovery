@@ -45,12 +45,15 @@ public class AutonomousConfig extends LinearOpMode {
         menu.addOption("Front Red Distance", 40, 10, 0.5, config.distanceToCryptoBoxInchesFrontRed);
         menu.addOption("Front Blue Distance", 40, 10, 0.5, config.distanceToCryptoBoxInchesFrontBlue);
 
+        menu.addOption("Back Red Balance Board Distance", 40, 10, 0.5, config.distanceToDriveOffBalanceBoardBackRed);
         menu.addOption("Back Red Distance", 20, 10, 0.5, config.distanceToCryptoBoxInchesBackRed);
+
+        menu.addOption("Back Blue Balance Board Distance", 40, 10, 0.5, config.distanceToDriveOffBalanceBoardBackBlue);
         menu.addOption("Back Blue Distance", 20, 10, 0.5, config.distanceToCryptoBoxInchesBackBlue);
-        menu.addOption("Back Balance Board Distance", 20, 30, 0.5, config.distanceToDriveOffBalanceBoardBack);
 
         menu.addOption("Speed", 1, 0, 0.05, config.speed);
         menu.addOption("Delay Start", 30, 0, 0.1, config.delayStart);
+        menu.addOption("Version", 100, 0, 1, config.version);
 
         menu.setGamepad(gamepad1);
         menu.setTelemetry(telemetry);
@@ -61,14 +64,16 @@ public class AutonomousConfig extends LinearOpMode {
 
             menu.displayMenu();
 
-            config.distanceToCryptoBoxInchesFrontRed  = Double.parseDouble(menu.getCurrentChoiceOf("Front Red Distance" ));
-            config.distanceToCryptoBoxInchesFrontBlue = Double.parseDouble(menu.getCurrentChoiceOf("Front Blue Distance"));
-            config.distanceToCryptoBoxInchesBackRed   = Double.parseDouble(menu.getCurrentChoiceOf("Back Red Distance"));
-            config.distanceToCryptoBoxInchesBackBlue  = Double.parseDouble(menu.getCurrentChoiceOf("Back Blue Distance"));
-            config.distanceToDriveOffBalanceBoardBack = Double.parseDouble(menu.getCurrentChoiceOf("Back Balance Board Distance"));
-            config.delayStart                         = Double.parseDouble(menu.getCurrentChoiceOf("Delay Start"));
-            config.speed                              = Double.parseDouble(menu.getCurrentChoiceOf("Speed"));
+            config.distanceToCryptoBoxInchesFrontRed        = Double.parseDouble(menu.getCurrentChoiceOf("Front Red Distance" ));
+            config.distanceToCryptoBoxInchesFrontBlue       = Double.parseDouble(menu.getCurrentChoiceOf("Front Blue Distance"));
+            config.distanceToCryptoBoxInchesBackRed         = Double.parseDouble(menu.getCurrentChoiceOf("Back Red Distance"));
+            config.distanceToCryptoBoxInchesBackBlue        = Double.parseDouble(menu.getCurrentChoiceOf("Back Blue Distance"));
+            config.distanceToDriveOffBalanceBoardBackBlue   = Double.parseDouble(menu.getCurrentChoiceOf("Back Blue Balance Board Distance"));
+            config.distanceToDriveOffBalanceBoardBackRed    = Double.parseDouble(menu.getCurrentChoiceOf("Back Red Balance Board Distance"));
+            config.delayStart                               = Double.parseDouble(menu.getCurrentChoiceOf("Delay Start"));
+            config.speed                                    = Double.parseDouble(menu.getCurrentChoiceOf("Speed"));
 
+            config.version                                  = Integer.parseInt(menu.getCurrentChoiceOf("Version"));
             switch (menu.getCurrentChoiceOf("Team")) {
                 case "RED":
                     config.color = Config.Colors.RED;

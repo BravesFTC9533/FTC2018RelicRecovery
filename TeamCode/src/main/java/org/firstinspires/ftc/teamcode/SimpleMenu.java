@@ -66,8 +66,6 @@ class Option
                 choiceIndex = i;
             }
         }
-
-        //choiceIndex = ((int) ((start+inc)/inc))-1;
     }
 
     public String getName()

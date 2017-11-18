@@ -35,6 +35,24 @@ public class Config {
     private static final String JEWELNAME = "jewel";
     private static final String CRYPTONAME = "crypto";
 
+    private static final String COLOR = "color";
+    private static final String POSITION = "position";
+
+    private static final String DISTANCETODRIVEOFFBALANCEBOARDBACKBLUE = "distanceToDriveOffBalanceBoardBackBlue";
+    private static final String DISTANCETODRIVEOFFBALANCEBOARDBACKRED = "distanceToDriveOffBalanceBoardBackRed";
+
+    private static final String DISTANCETOCRYPTOBOXINCHESBACKBLUE = "distanceToCryptoBoxInchesBackBlue";
+    private static final String DISTANCETOCRYPTOBOXINCHESBACKRED = "distanceToCryptoBoxInchesBackRed";
+
+
+    private static final String DISTANCETOCRYPTOBOXINCHESFRONTBLUE = "distanceToCryptoBoxInchesFrontBlue";
+    private static final String DISTANCETOCRYPTOBOXINCHESFRONTRED = "distanceToCryptoBoxInchesFrontRed";
+
+    private static final String DELAYSTART = "delayStart";
+    private static final String SPEED = "speed";
+
+    private static final String VERSION = "version";
+
 
     Context context;
     public Config(Context context) {
@@ -42,6 +60,30 @@ public class Config {
 
     }
 
+
+    private <T> T tryGetValue(JSONObject json, String name, T defaultValue, Class<T> type) {
+        if(type == null) throw new NullPointerException("type is null");
+
+        if(json.has(name) == false) {
+            return defaultValue;
+        }
+        try {
+
+            String value = json.getString(name);
+
+            if(type.equals(Integer.class)) {
+                return  (T)Integer.valueOf(value);
+            } else if(type.equals(Double.class)) {
+                return  (T)Double.valueOf(value);
+            } else if(type.equals(String.class)) {
+                return  (T)String.valueOf(value);
+            }
+        }
+        catch(NumberFormatException|NullPointerException|JSONException ex){
+
+        }
+        throw new IllegalArgumentException("Invalid class " + type);
+    }
 
     public void Read(){
 
@@ -56,7 +98,7 @@ public class Config {
 
                 JSONObject json = new JSONObject(jsonTxt);
 
-                String c = json.getString("color");
+                String c = json.getString(COLOR);
 
                 if(c.equals("RED")) {
                     this.color = Colors.RED;
@@ -72,21 +114,32 @@ public class Config {
                     this.position = Positions.BACK;
                 }
 
-                this.JewelKnockOff = json.getBoolean("jewel");
-                this.CryptoBox = json.getBoolean("crypto");
-                this.Park = json.getBoolean("park");
+                this.JewelKnockOff = json.getBoolean(JEWELNAME);
+                this.CryptoBox = json.getBoolean(CRYPTONAME);
+                this.Park = json.getBoolean(PARKNAME);
 
-                if(json.has("distanceToCryptoBoxInchesFrontRed")) {
+                if(json.has(VERSION) && json.getInt(VERSION) != 0) {
 
-                    this.distanceToCryptoBoxInchesBackBlue = json.getDouble("distanceToCryptoBoxInchesBackBlue");
-                    this.distanceToCryptoBoxInchesBackRed = json.getDouble("distanceToCryptoBoxInchesBackRed");
-                    this.distanceToDriveOffBalanceBoardBack = json.getDouble("distanceToDriveOffBalanceBoardBack");
 
-                    this.distanceToCryptoBoxInchesFrontRed = json.getDouble("distanceToCryptoBoxInchesFrontRed");
-                    this.distanceToCryptoBoxInchesFrontBlue = json.getDouble("distanceToCryptoBoxInchesFrontBlue");
+                    this.distanceToCryptoBoxInchesFrontRed = tryGetValue(json, DISTANCETOCRYPTOBOXINCHESFRONTRED, 32.5, Double.class);
+                    this.distanceToCryptoBoxInchesFrontBlue = tryGetValue(json, DISTANCETOCRYPTOBOXINCHESFRONTBLUE, 18.0, Double.class);
 
-                    this.delayStart = json.getDouble("delayStart");
-                    this.speed = json.getDouble("speed");
+
+                    this.distanceToDriveOffBalanceBoardBackBlue = tryGetValue(json, DISTANCETODRIVEOFFBALANCEBOARDBACKBLUE, 26.0, Double.class);
+                    this.distanceToDriveOffBalanceBoardBackRed = tryGetValue(json, DISTANCETODRIVEOFFBALANCEBOARDBACKRED,  32.0, Double.class);
+                    this.distanceToCryptoBoxInchesBackRed = tryGetValue(json, DISTANCETOCRYPTOBOXINCHESBACKRED, 13.5, Double.class);
+                    this.distanceToCryptoBoxInchesBackBlue = tryGetValue(json, DISTANCETOCRYPTOBOXINCHESBACKBLUE, 13.0, Double.class);
+
+                    this.delayStart = json.getDouble(DELAYSTART);
+                    this.speed = json.getDouble(SPEED);
+                    this.version = json.getInt(VERSION);
+//                    this.distanceToDriveOffBalanceBoardBackBlue = json.getDouble(DISTANCETODRIVEOFFBALANCEBOARDBACKBLUE);
+//                    this.distanceToDriveOffBalanceBoardBackRed = json.getDouble(DISTANCETODRIVEOFFBALANCEBOARDBACKRED);
+//
+//                    this.distanceToCryptoBoxInchesFrontRed = json.getDouble(DISTANCETOCRYPTOBOXINCHESFRONTRED);
+//                    this.distanceToCryptoBoxInchesFrontBlue = json.getDouble(DISTANCETOCRYPTOBOXINCHESFRONTBLUE);
+
+
 
                 } else {
                     //give default values
@@ -94,13 +147,15 @@ public class Config {
                     this.distanceToCryptoBoxInchesFrontBlue = 18.0;
 
 
-                    this.distanceToDriveOffBalanceBoardBack = 26.0;
+                    this.distanceToDriveOffBalanceBoardBackBlue = 26.0;
+                    this.distanceToDriveOffBalanceBoardBackRed = 32.0;
                     this.distanceToCryptoBoxInchesBackRed = 13.5;
                     this.distanceToCryptoBoxInchesBackBlue = 13.0;
 
                     this.delayStart = 0.0;
                     this.speed = 0.5;
 
+                    this.version = 1;
                 }
 
             }
@@ -108,6 +163,8 @@ public class Config {
 
         }
     }
+
+
 
     static String convertStreamToString(java.io.InputStream is) {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
@@ -119,21 +176,23 @@ public class Config {
         JSONObject obj = new JSONObject() ;
 
         try {
-            obj.put("color", color.toString());
-            obj.put("position", position.toString());
-            obj.put("park", Park);
-            obj.put("jewel", JewelKnockOff);
-            obj.put("crypto", CryptoBox);
+            obj.put(COLOR, color.toString());
+            obj.put(POSITION, position.toString());
+            obj.put(PARKNAME, Park);
+            obj.put(JEWELNAME, JewelKnockOff);
+            obj.put(CRYPTONAME, CryptoBox);
 
-            obj.put("distanceToCryptoBoxInchesBackBlue", this.distanceToCryptoBoxInchesBackBlue);
-            obj.put("distanceToCryptoBoxInchesBackRed", this.distanceToCryptoBoxInchesBackRed);
-            obj.put("distanceToDriveOffBalanceBoardBack", this.distanceToDriveOffBalanceBoardBack);
-            obj.put("distanceToCryptoBoxInchesFrontBlue", this.distanceToCryptoBoxInchesFrontBlue);
-            obj.put("distanceToCryptoBoxInchesFrontRed", this.distanceToCryptoBoxInchesFrontRed);
+            obj.put(DISTANCETOCRYPTOBOXINCHESBACKBLUE, this.distanceToCryptoBoxInchesBackBlue);
+            obj.put(DISTANCETOCRYPTOBOXINCHESBACKRED, this.distanceToCryptoBoxInchesBackRed);
+            obj.put(DISTANCETODRIVEOFFBALANCEBOARDBACKRED, this.distanceToDriveOffBalanceBoardBackRed);
+            obj.put(DISTANCETODRIVEOFFBALANCEBOARDBACKBLUE, this.distanceToDriveOffBalanceBoardBackBlue);
+            obj.put(DISTANCETOCRYPTOBOXINCHESFRONTBLUE, this.distanceToCryptoBoxInchesFrontBlue);
+            obj.put(DISTANCETOCRYPTOBOXINCHESFRONTRED, this.distanceToCryptoBoxInchesFrontRed);
 
-            obj.put("delayStart", this.delayStart);
-            obj.put("speed", this.speed);
+            obj.put(DELAYSTART, this.delayStart);
+            obj.put(SPEED, this.speed);
 
+            obj.put(VERSION, this.version);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -183,7 +242,8 @@ public class Config {
     public double distanceToCryptoBoxInchesFrontBlue;
 
 
-    public double distanceToDriveOffBalanceBoardBack;
+    public double distanceToDriveOffBalanceBoardBackBlue;
+    public double distanceToDriveOffBalanceBoardBackRed;
     public double distanceToCryptoBoxInchesBackRed;
     public double distanceToCryptoBoxInchesBackBlue;
 
@@ -192,6 +252,7 @@ public class Config {
     public double delayStart;
     public double speed;
 
+    public int version;
 
 
 }
