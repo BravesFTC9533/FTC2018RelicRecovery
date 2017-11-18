@@ -36,6 +36,9 @@ public class Robot {
 
     public DigitalChannel touchSensor = null;
 
+
+    private static final double LIFTSPEED = 0.75;
+
     public enum ColorSensed {
         RED,
         BLUE,
@@ -218,13 +221,14 @@ public class Robot {
     }
 
     public void GrabberLiftRaise() {
-        motorLift.setPower(1);
+        motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorLift.setPower(LIFTSPEED);
     }
 
     public void GrabberLiftLower() {
         // if the digital channel returns true it's HIGH and the button is unpressed.
         if(touchSensor.getState() == true) {
-            motorLift.setPower(-1);
+            motorLift.setPower(-LIFTSPEED);
         } else {
             GrabberLiftStop();
         }
