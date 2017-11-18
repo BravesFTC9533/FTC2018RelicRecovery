@@ -60,10 +60,14 @@ class Option
         choices = new String[size];
         for (int i = 0; i < size; i++)
         {
-            choices[i] = String.valueOf(inc*i);
+            double val = min + (inc*i);
+            choices[i] = String.valueOf(val);
+            if(val == start) {
+                choiceIndex = i;
+            }
         }
 
-        choiceIndex = ((int) ((start+inc)/inc))-1;
+        //choiceIndex = ((int) ((start+inc)/inc))-1;
     }
 
     public String getName()
@@ -183,7 +187,9 @@ public class SimpleMenu {
             if (this.currentOption == count) {
                 this.telemetry.addData(">> " + o2.getName(), o2.getCurrentChoice());
             } else {
-                this.telemetry.addData(o2.getName(), o2.getCurrentChoice());
+                String name = o2.getName();
+
+                this.telemetry.addData(name, o2.getCurrentChoice());
             }
             ++count;
         }
