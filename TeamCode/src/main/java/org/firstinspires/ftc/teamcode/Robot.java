@@ -50,7 +50,7 @@ public class Robot {
     private static final int COLOR_SENSOR_BLUE_THRESHOLD = 40;
 
     private static final double COLOR_RETRACTED_POSITION = 1;
-    private static final double COLOR_EXTENDED_POSITION = 0.4;
+    private static final double COLOR_EXTENDED_POSITION = 0.32;
 
 
     private static final double GRABBER_LEFT_OPEN_POSITION = 0;

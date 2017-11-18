@@ -73,7 +73,7 @@ public class AutonomousConfig extends LinearOpMode {
             config.delayStart                               = Double.parseDouble(menu.getCurrentChoiceOf("Delay Start"));
             config.speed                                    = Double.parseDouble(menu.getCurrentChoiceOf("Speed"));
 
-            config.version                                  = Integer.parseInt(menu.getCurrentChoiceOf("Version"));
+            config.version                                  = Double.parseDouble(menu.getCurrentChoiceOf("Version"));
             switch (menu.getCurrentChoiceOf("Team")) {
                 case "RED":
                     config.color = Config.Colors.RED;

@@ -126,8 +126,8 @@ public class Autonomous9533 extends LinearOpMode {
 
     void knockOffJewel() {
 
-        double movement = 2.0; //how far to move in inches
-        double speed = 0.2; //how fast to move
+        double movement = 2.5; //how far to move in inches
+        double speed = 0.35; //how fast to move
         boolean moveForward = false;
         double timeoutS = 4.0; //how long before timing out movement
 
@@ -197,7 +197,7 @@ public class Autonomous9533 extends LinearOpMode {
             robot.GrabberGrab();
             waitForTick(500);
             robot.GrabberLiftRaise();
-            waitForTick(500);
+            waitForTick(300);
             robot.GrabberLiftStop();
 
             //move into position to sense jewel color
@@ -306,22 +306,25 @@ public class Autonomous9533 extends LinearOpMode {
     }
 
     void dropCryptoblock() {
+
+
         backUp(1.0);
-
         pause();
-        updateStep("Lower block");
-        robot.GrabberLiftLower();
-        waitForTick(500);
-        robot.GrabberLiftStop();
-        updateStep("Finished lower block");
 
-        pause();
         updateStep("Drop block");
         robot.GrabberLoose();
         updateStep("Finished drop block");
 
+        updateStep("Lower block");
+        robot.GrabberLiftLower();
+        waitForTick(300);
+        robot.GrabberLiftStop();
+        updateStep("Finished lower block");
 
-        backUp(1.0);
+        pause();
+
+
+        backUp(2.0);
     }
 
     void runProgramFront() {

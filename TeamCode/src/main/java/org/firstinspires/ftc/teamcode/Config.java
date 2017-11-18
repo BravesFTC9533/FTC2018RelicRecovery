@@ -118,7 +118,7 @@ public class Config {
                 this.CryptoBox = json.getBoolean(CRYPTONAME);
                 this.Park = json.getBoolean(PARKNAME);
 
-                if(json.has(VERSION) && json.getInt(VERSION) != 0) {
+                if(json.has(VERSION) && json.getDouble(VERSION) != 0.0) {
 
 
                     this.distanceToCryptoBoxInchesFrontRed = tryGetValue(json, DISTANCETOCRYPTOBOXINCHESFRONTRED, 32.5, Double.class);
@@ -132,7 +132,7 @@ public class Config {
 
                     this.delayStart = json.getDouble(DELAYSTART);
                     this.speed = json.getDouble(SPEED);
-                    this.version = json.getInt(VERSION);
+                    this.version = json.getDouble(VERSION);
 //                    this.distanceToDriveOffBalanceBoardBackBlue = json.getDouble(DISTANCETODRIVEOFFBALANCEBOARDBACKBLUE);
 //                    this.distanceToDriveOffBalanceBoardBackRed = json.getDouble(DISTANCETODRIVEOFFBALANCEBOARDBACKRED);
 //
@@ -155,7 +155,7 @@ public class Config {
                     this.delayStart = 0.0;
                     this.speed = 0.5;
 
-                    this.version = 1;
+                    this.version = 1.0;
                 }
 
             }
@@ -252,7 +252,7 @@ public class Config {
     public double delayStart;
     public double speed;
 
-    public int version;
+    public double version;
 
 
 }
