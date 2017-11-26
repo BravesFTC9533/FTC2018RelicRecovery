@@ -46,6 +46,9 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
             robot.handleLiftMotor(gamepad2);
 
+            telemetry.addLine()
+                    .addData("Lift Pos", "%d", robot.motorLift.getCurrentPosition());
+
 
             //detectColor();
 //            telemetry.addData("Grabber L", "%.2f", robot.blockGrabberLeft.getPosition());
@@ -133,12 +136,21 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
         switch (button)
         {
             case FtcGamePad.GAMEPAD_A:
+                // used for cryptoblock lift
                 break;
             case FtcGamePad.GAMEPAD_B:
+
                 break;
             case FtcGamePad.GAMEPAD_X:
+
+
+                if(pressed) {
+                    robot.toggleRelicLift();
+                }
+
                 break;
             case FtcGamePad.GAMEPAD_Y:
+                // used for cryptoblock lift
                 break;
 
             case FtcGamePad.GAMEPAD_LBUMPER:

@@ -27,6 +27,8 @@ public class Robot {
 
     public DcMotor motorLift = null;
 
+
+
     public Servo colorServo = null;
     public ColorSensor colorSensor = null;
 
@@ -35,6 +37,12 @@ public class Robot {
     public Servo blockGrabberRight = null;
 
     public DigitalChannel touchSensor = null;
+
+
+
+    public Servo relicGrabberServo = null;
+    public Servo relicRaiserServo = null;
+
 
 
     private static final double LIFTSPEED = 0.75;
@@ -58,6 +66,10 @@ public class Robot {
 
     private static final double GRABBER_LEFT_CLOSE_POSITION = 0;
     private static final double GRABBER_RIGHT_CLOSE_POSITION = 0;
+
+
+    private static final int LIFT_MOTOR_MAX_POSITION = 4380;
+    private static final int LIFT_MOTOR_TOLERANCE = 400;
 
 
 
@@ -88,6 +100,10 @@ public class Robot {
         //relicArmExtender.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
+        motorLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         colorServo = hardwareMap.servo.get("colorServo");
         colorSensor = hardwareMap.colorSensor.get("colorSensor");
 
@@ -102,6 +118,9 @@ public class Robot {
         // set the digital channel to input.
         touchSensor.setMode(DigitalChannel.Mode.INPUT);
 
+
+        relicGrabberServo = hardwareMap.get(Servo.class, "relicGrabber");
+        relicRaiserServo = hardwareMap.get(Servo.class, "relicRaiser");
 
     }
 
@@ -221,20 +240,61 @@ public class Robot {
     }
 
     public void GrabberLiftRaise() {
+
         motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorLift.setPower(LIFTSPEED);
+        if(motorLift.getCurrentPosition() >= LIFT_MOTOR_MAX_POSITION - LIFT_MOTOR_TOLERANCE) {
+            motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motorLift.setTargetPosition(LIFT_MOTOR_MAX_POSITION);
+        } else {
+            motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
     }
 
     public void GrabberLiftLower() {
+
+
+        motorLift.setPower(-LIFTSPEED);
+        motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+       // boolean pressed = touchSensor.getState() != true;
+
         // if the digital channel returns true it's HIGH and the button is unpressed.
-        if(touchSensor.getState() == true) {
-            motorLift.setPower(-LIFTSPEED);
+        if( motorLift.getCurrentPosition() > LIFT_MOTOR_TOLERANCE) {
+
+            motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         } else {
-            GrabberLiftStop();
+
+            motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motorLift.setTargetPosition(0);
+
+            //GrabberLiftStop();
         }
     }
+
     public void GrabberLiftStop() {
+        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLift.setPower(0);
+    }
+
+
+    private boolean relicLifted= false;
+
+    public void toggleRelicLift() {
+        if(relicLifted) {
+            lowerRelic();
+        } else {
+            liftRelic();
+        }
+        relicLifted = !relicLifted;
+    }
+    public void liftRelic() {
+
+        relicRaiserServo.setPosition(0.0);
+    }
+
+    public void lowerRelic() {
+        relicRaiserServo.setPosition(1.0);
     }
 
 }
