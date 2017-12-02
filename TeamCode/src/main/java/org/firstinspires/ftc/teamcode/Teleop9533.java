@@ -44,7 +44,7 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
         driverGamepad = new FtcGamePad("DriverGamepad", gamepad1, this);
         operatorGamepad = new FtcGamePad("OperatorGamepad", gamepad2, this);
 
-        robotDrive = new GTADrive(robot, driverGamepad);
+        robotDrive = new GTADrive2(robot, driverGamepad);
 
 
         telemetry.addData("Waiting for start..", "");
@@ -65,7 +65,9 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
             driverGamepad.update();
             operatorGamepad.update();
 
-            robotDrive.handle();
+            if(!parking) {
+                robotDrive.handle();
+            }
 
             robot.handleLiftMotor(gamepad2);
 
@@ -174,13 +176,14 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
     }
 
 
-
+    boolean parking = false;
     void parkRobot() {
+        parking = true;
         robot.setPower(1, 1);
         sleep(250);
         robot.setPower(-1, -1);
-        sleep(250);
-        robot.setPower(-0.5, -0.5);
+        sleep(150);
+        robot.setPower(-0.4, -0.4);
         sleep(750);
         robot.setPower(0,0);
         ElapsedTime runtime = new ElapsedTime();
@@ -206,6 +209,7 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
         }
 
         robot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        parking = false;
     }
 
     /*
