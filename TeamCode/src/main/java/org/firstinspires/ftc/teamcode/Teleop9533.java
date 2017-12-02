@@ -4,7 +4,20 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
+import java.util.Locale;
 
 /**
  * Created by dmill on 10/29/2017.
@@ -20,6 +33,10 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
     private IDrive robotDrive;
 
+    // State used for updating telemetry
+    Orientation angles;
+    Acceleration gravity;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -33,7 +50,13 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
         telemetry.addData("Waiting for start..", "");
         telemetry.update();
 
+
+        // Set up our telemetry dashboard
+        composeTelemetry();
+
         waitForStart();
+
+
 
         robot.retractColorArm();
 
@@ -46,13 +69,7 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
             robot.handleLiftMotor(gamepad2);
 
-            telemetry.addLine()
-                    .addData("Lift Pos", "%d", robot.motorLift.getCurrentPosition());
 
-
-            //detectColor();
-//            telemetry.addData("Grabber L", "%.2f", robot.blockGrabberLeft.getPosition());
-//            telemetry.addData("Grabber R", "%.2f", robot.blockGrabberRight.getPosition());
             telemetry.update();
         }
 
@@ -61,30 +78,6 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
 
     }
-
-
-    void detectColor() {
-        float[] hsv = {0F, 0F, 0F};
-
-        int red = robot.colorSensor.red();
-        int green = robot.colorSensor.green();
-        int blue = robot.colorSensor.blue();
-
-        Color.RGBToHSV(red * 255, green * 255, blue * 255, hsv);
-
-        telemetry.addLine()
-                .addData("Red", "%d", red)
-                .addData("Green", "%d", green)
-                .addData("Blue", "%d", blue);
-
-        telemetry.addLine()
-                .addData("Hue", "%7f", hsv[0])
-                .addData("Sat", "%7f", hsv[1])
-                .addData("Val", "%7f", hsv[2]);
-
-
-    }
-
 
 
     @Override
@@ -123,8 +116,17 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
             case FtcGamePad.GAMEPAD_RBUMPER:
 
-                robotDrive.setIsReverse(!robotDrive.getIsReverse());
+                if(pressed) {
+                    robotDrive.setIsReverse(!robotDrive.getIsReverse());
+                }
+
                 break;
+            case FtcGamePad.GAMEPAD_START:
+                if(pressed) {
+                    parkRobot();
+                }
+                break;
+
         }
 
 
@@ -172,5 +174,166 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
     }
 
 
+
+    void parkRobot() {
+        robot.setPower(1, 1);
+        sleep(250);
+        robot.setPower(-1, -1);
+        sleep(250);
+        robot.setPower(-0.5, -0.5);
+        sleep(750);
+        robot.setPower(0,0);
+        ElapsedTime runtime = new ElapsedTime();
+
+        while(opModeIsActive() && runtime.seconds() < 10) {
+            Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            double degrees = AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.secondAngle);
+
+            if(degrees > -2 && degrees < 2) {
+                break;
+            }
+
+            double distance = 0;
+            if(degrees < 0) {
+                //move backwards
+                distance = -2;
+            } else {
+                //move forwards
+                distance = 1;
+            }
+
+            encoderDrive(0.7, distance, distance, 4, true);
+        }
+
+        robot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    /*
+    *  Method to perform a relative move, based on encoder counts.
+    *  Encoders are not reset as the move is based on the current position.
+    *  Move will stop if any of three conditions occur:
+    *  1) Move gets to the desired position
+    *  2) Move runs out of time
+    *  3) Driver stops the opmode running.
+    */
+    public void encoderDrive(double speed,
+                             double leftInches, double rightInches,
+                             double timeoutS, boolean holdPosition) {
+        int newLeftTarget;
+        int newRightTarget;
+
+        ElapsedTime runtime = new ElapsedTime();
+
+        robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            robot.setNewPosition(leftInches, rightInches);
+
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+
+            double currentSpeed = 0;
+            if(Math.abs(leftInches) < 2 && Math.abs(rightInches) < 2) {
+                currentSpeed = speed;
+            }
+
+            double multiplier = 0;
+
+            robot.setPower(currentSpeed , currentSpeed);
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.isBusy())) {
+
+
+                if(currentSpeed < speed) {
+                    multiplier = Easing.Interpolate(runtime.seconds() * 2, Easing.Functions.CubicEaseOut);
+                    currentSpeed = speed * multiplier;
+                }
+
+
+                //telemetry.update();
+
+                if(currentSpeed > speed) {
+                    currentSpeed = speed;
+                }
+                robot.setPower(currentSpeed, currentSpeed);
+
+
+            }
+
+            if(holdPosition==false) {
+                // Stop all motion;
+                robot.stop();
+
+                // Turn off RUN_TO_POSITION
+                robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+        }
+    }
+
+
+    void composeTelemetry() {
+
+        // At the beginning of each telemetry update, grab a bunch of data
+        // from the IMU that we will then display in separate lines.
+        telemetry.addAction(new Runnable() { @Override public void run()
+        {
+            // Acquiring the angles is relatively expensive; we don't want
+            // to do that in each of the three items that need that info, as that's
+            // three times the necessary expense.
+            angles   = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        }
+        });
+
+        telemetry.addLine()
+                .addData("status", new Func<String>() {
+                    @Override public String value() {
+                        return robot.imu.getSystemStatus().toShortString();
+                    }
+                })
+                .addData("calib", new Func<String>() {
+                    @Override public String value() {
+                        return robot.imu.getCalibrationStatus().toString();
+                    }
+                });
+
+        telemetry.addLine()
+                .addData("heading", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.firstAngle);
+                    }
+                })
+                .addData("roll", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.secondAngle);
+                    }
+                })
+                .addData("pitch", new Func<String>() {
+                    @Override public String value() {
+                        return formatAngle(angles.angleUnit, angles.thirdAngle);
+                    }
+                });
+    }
+
+    //----------------------------------------------------------------------------------------------
+    // Formatting
+    //----------------------------------------------------------------------------------------------
+
+    String formatAngle(AngleUnit angleUnit, double angle) {
+        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
+    }
+
+    String formatDegrees(double degrees){
+        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
+    }
 
 }
