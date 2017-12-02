@@ -196,7 +196,7 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
                 break;
             }
 
-            double distance = 0;
+            double distance;
             if(degrees < 0) {
                 //move backwards
                 distance = -2;
@@ -239,9 +239,9 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
             runtime.reset();
 
             double currentSpeed = 0;
-            if(Math.abs(leftInches) < 2 && Math.abs(rightInches) < 2) {
-                currentSpeed = speed;
-            }
+//            if(Math.abs(leftInches) < 2 && Math.abs(rightInches) < 2) {
+//                currentSpeed = speed;
+//            }
 
             double multiplier = 0;
 
@@ -259,7 +259,7 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
 
                 if(currentSpeed < speed) {
-                    multiplier = Easing.Interpolate(runtime.seconds() * 2, Easing.Functions.CubicEaseOut);
+                    multiplier = Easing.Interpolate(runtime.seconds() * 2, Easing.Functions.QuinticEaseOut);
                     currentSpeed = speed * multiplier;
                 }
 
