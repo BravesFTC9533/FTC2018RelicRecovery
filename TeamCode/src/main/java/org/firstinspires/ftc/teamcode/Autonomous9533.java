@@ -33,6 +33,7 @@ public class Autonomous9533 extends LinearOpMode {
     private static final double cryptoBoxWidth = 7.5;
     private static final long pauseTimeBetweenSteps = 250;
     private double speed = 0.5;
+    private double fast_speed = 0.8;
 
     String currentStep = "";
 
@@ -48,25 +49,37 @@ public class Autonomous9533 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
+
+        robot = new Robot(hardwareMap);
+        robot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.stop();
+
         config = new Config(hardwareMap.appContext);
         config.Read();
 
         speed = config.speed;
+
+
+        telemetry.addData("**** PLEASE WAIT FOR VUFORIA TO INIT ****", "");
 
         telemetry.addData("Color:", config.color.toString());
         telemetry.addData("Position:", config.position.toString());
         telemetry.addData("Park:", config.Park);
         telemetry.addData("Jewel:", config.JewelKnockOff);
         telemetry.addData("Crypto:", config.CryptoBox);
+
         telemetry.update();
 
 
-        robot = new Robot(hardwareMap);
-        robot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        robot.stop();
+
+
+
 
         vuforiaHelper = new VuforiaHelper();
         vuforiaHelper.initVuforia(hardwareMap);
+
+        telemetry.addData("Vuforia:", "Initialized!");
+        telemetry.update();
 
         composeTelemetry();
         waitForStart();
@@ -191,18 +204,22 @@ public class Autonomous9533 extends LinearOpMode {
     void runProgram() {
 
         if(config.CryptoBox && opModeIsActive()) {
+            updateStep("Reading pictograph");
             readPictograph();
 
             // grab block and lift
+            updateStep("Grabbing block");
             robot.GrabberGrab();
             waitForTick(500);
-            robot.GrabberLiftRaise();
-            waitForTick(300);
-            robot.GrabberLiftStop();
 
+            updateStep("Lifting block");
+            encoderLift(7);
+
+
+            updateStep("Moving into position to knock off jewel");
             //move into position to sense jewel color
             double distanceForSensor = 2.0;
-            encoderDrive(0.2, distanceForSensor, distanceForSensor, 4, true);
+            encoderDrive(0.4, distanceForSensor, distanceForSensor, 4, true);
 
         }
 
@@ -276,21 +293,25 @@ public class Autonomous9533 extends LinearOpMode {
         updateStep("Driving off of balance board");
         encoderDrive(speed, distance, distance, 7.0);
         updateStep("Finished driving off of balance board");
-
         pause();
+
         turn90(TurnDirection.CLOCKWISE);
-
         pause();
+
 
         //move backwards to wall
         double distanceToWall = 15.0; //this should be pretty static if not overkill for red
         encoderDrive(speed, -distanceToWall, -distanceToWall, 5.0);
         pause();
 
+        updateStep("Lower block some");
+        encoderLift(1.0);
+        pause();
+
         //move to correct position in front of crypto wall
         double distanceToFirstBox = (config.color == Config.Colors.RED) ? config.distanceToCryptoBoxInchesBackRed : config.distanceToCryptoBoxInchesBackBlue;
         distance = distanceToFirstBox + distanceToDrive;
-        encoderDrive(speed, distance, distance, 5.0);
+        encoderDrive(fast_speed, distance, distance, 5.0);
         pause();
 
         TurnDirection dir = (config.color == Config.Colors.RED) ? TurnDirection.CLOCKWISE : TurnDirection.COUNTERCLOCKWISE;
@@ -311,20 +332,33 @@ public class Autonomous9533 extends LinearOpMode {
         backUp(1.0);
         pause();
 
+        encoderLift(1.0);
         updateStep("Drop block");
         robot.GrabberLoose();
         updateStep("Finished drop block");
 
-        updateStep("Lower block");
-        robot.GrabberLiftLower();
-        waitForTick(300);
-        robot.GrabberLiftStop();
+        encoderLift(0.0);
+//        updateStep("Lower block");
+//        robot.GrabberLiftLower();
+//        waitForTick(300);
+//        robot.GrabberLiftStop();
         updateStep("Finished lower block");
 
         pause();
 
-
+        robot.GrabberStart();
         backUp(2.0);
+        //backup negative is move forward..
+        backUp(-5.0);
+        backUp(2.0);
+
+        //        while(opModeIsActive()) {
+//            robot.GrabberOpen();
+//            backUp(2.0);
+//            robot.GrabberStart();
+//            backUp(-2.0);
+//        }
+
     }
 
     void runProgramFront() {
@@ -386,6 +420,21 @@ public class Autonomous9533 extends LinearOpMode {
         return vuMark;
     }
 
+
+    public void encoderLift(double inches) {
+        ElapsedTime lifttime = new ElapsedTime();
+
+        if(opModeIsActive()) {
+            robot.setLiftPosition(inches);
+
+            lifttime.reset();
+            robot.motorLift.setPower(robot.LIFTSPEED);
+            while(opModeIsActive() && lifttime.seconds() < 2 && robot.motorLift.isBusy()) {
+
+            }
+            robot.GrabberLiftStop();
+        }
+    }
 
 
 

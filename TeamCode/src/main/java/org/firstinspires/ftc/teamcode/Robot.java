@@ -56,7 +56,7 @@ public class Robot {
 
     public BNO055IMU imu = null;
 
-    private static final double LIFTSPEED = 0.75;
+    public static final double LIFTSPEED = 0.75;
 
     public enum ColorSensed {
         RED,
@@ -79,7 +79,7 @@ public class Robot {
     private static final double GRABBER_RIGHT_CLOSE_POSITION = 0;
 
 
-    private static final int LIFT_MOTOR_MAX_POSITION = 4380;
+    private static final int LIFT_MOTOR_MAX_POSITION = 10000;
     private static final int LIFT_MOTOR_TOLERANCE = 400;
 
 
@@ -113,7 +113,6 @@ public class Robot {
 
 
         motorLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         colorServo = hardwareMap.servo.get("colorServo");
@@ -185,6 +184,15 @@ public class Robot {
 
         // Turn On RUN_TO_POSITION
         setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void setLiftPosition(double inches) {
+
+        int newTarget = (int)(inches * COUNTS_PER_INCH);
+        motorLift.setTargetPosition(newTarget);
+
+        motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
     }
 
     public void setMode(DcMotor.RunMode mode) {
@@ -268,6 +276,14 @@ public class Robot {
         } else {
             GrabberLiftStop();
         }
+
+    }
+
+
+    public void GrabberToInches(double inches) {
+        setLiftPosition(inches);
+        motorLift.setPower(LIFTSPEED);
+
 
     }
 
