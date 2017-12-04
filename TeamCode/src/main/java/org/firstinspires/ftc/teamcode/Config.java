@@ -143,13 +143,13 @@ public class Config {
 
                 } else {
                     //give default values
-                    this.distanceToCryptoBoxInchesFrontRed = 32.5;
-                    this.distanceToCryptoBoxInchesFrontBlue = 18.0;
+                    this.distanceToCryptoBoxInchesFrontRed = 30.0;
+                    this.distanceToCryptoBoxInchesFrontBlue = 20.5;
 
 
-                    this.distanceToDriveOffBalanceBoardBackBlue = 26.0;
-                    this.distanceToDriveOffBalanceBoardBackRed = 32.0;
-                    this.distanceToCryptoBoxInchesBackRed = 13.5;
+                    this.distanceToDriveOffBalanceBoardBackRed = 29.0;
+                    this.distanceToCryptoBoxInchesBackRed = 12.0;
+                    this.distanceToDriveOffBalanceBoardBackBlue = 25.0;
                     this.distanceToCryptoBoxInchesBackBlue = 13.0;
 
                     this.delayStart = 0.0;

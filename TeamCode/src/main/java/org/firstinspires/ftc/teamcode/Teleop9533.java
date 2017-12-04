@@ -326,6 +326,22 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
                         return formatAngle(angles.angleUnit, angles.thirdAngle);
                     }
                 });
+        telemetry.addLine()
+                .addData("Left", new Func<String>() {
+                    @Override public String value() {
+                        return formatDouble(robot.blockGrabberLeft.getPosition());
+                    }
+                })
+                .addData("Right", new Func<String>() {
+                    @Override public String value() {
+                        return formatDouble(robot.blockGrabberRight.getPosition());
+                    }
+                })
+                .addData("Lift", new Func<String>() {
+                    @Override public String value() {
+                        return formatDouble(robot.motorLift.getCurrentPosition());
+                    }
+                });
     }
 
     //----------------------------------------------------------------------------------------------
@@ -336,6 +352,10 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
         return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
     }
 
+
+    String formatDouble(double value) {
+        return  String.format("%.1f", value);
+    }
     String formatDegrees(double degrees){
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }

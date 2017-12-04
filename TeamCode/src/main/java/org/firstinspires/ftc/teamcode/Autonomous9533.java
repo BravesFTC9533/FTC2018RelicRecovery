@@ -216,10 +216,10 @@ public class Autonomous9533 extends LinearOpMode {
             encoderLift(7);
 
 
-            updateStep("Moving into position to knock off jewel");
+            //updateStep("Moving into position to knock off jewel");
             //move into position to sense jewel color
-            double distanceForSensor = 2.0;
-            encoderDrive(0.4, distanceForSensor, distanceForSensor, 4, true);
+//            double distanceForSensor = 2.0;
+//            encoderDrive(0.4, distanceForSensor, distanceForSensor, 4, true);
 
         }
 
@@ -432,7 +432,9 @@ public class Autonomous9533 extends LinearOpMode {
             while(opModeIsActive() && lifttime.seconds() < 2 && robot.motorLift.isBusy()) {
 
             }
-            robot.GrabberLiftStop();
+            if(inches == 0) {
+                robot.GrabberLiftStop();
+            }
         }
     }
 

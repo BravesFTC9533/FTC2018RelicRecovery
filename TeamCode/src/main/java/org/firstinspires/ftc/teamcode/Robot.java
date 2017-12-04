@@ -56,7 +56,7 @@ public class Robot {
 
     public BNO055IMU imu = null;
 
-    public static final double LIFTSPEED = 0.75;
+    public static final double LIFTSPEED = 1.0;
 
     public enum ColorSensed {
         RED,
@@ -79,7 +79,7 @@ public class Robot {
     private static final double GRABBER_RIGHT_CLOSE_POSITION = 0;
 
 
-    private static final int LIFT_MOTOR_MAX_POSITION = 10000;
+    private static final int LIFT_MOTOR_MAX_POSITION = 5000;
     private static final int LIFT_MOTOR_TOLERANCE = 400;
 
 
@@ -158,7 +158,7 @@ public class Robot {
     public void stop() {
         motorLeft.setPower(0);
         motorRight.setPower(0);
-        motorLift.setPower(0);
+        //motorLift.setPower(0);
         //relicArmExtender.setPower(0);
     }
 
@@ -235,10 +235,10 @@ public class Robot {
 
 
 
-    Pair<Double,Double> grab = new Pair<>(0.05, 0.90);
-    Pair<Double,Double> loose = new Pair<>(0.15, 0.80);
-    Pair<Double,Double> open = new Pair<>(0.30, 0.60);
-    Pair<Double,Double> start = new Pair<>(0.65, 0.25);
+    Pair<Double,Double> grab = new Pair<>(0.0, 1.0);
+    Pair<Double,Double> loose = new Pair<>(0.20, 0.60);
+    Pair<Double,Double> open = new Pair<>(0.30, 0.50);
+    Pair<Double,Double> start = new Pair<>(1.0, 0.0);
 
     private void setGrabberPosition(Pair<Double,Double> pair) {
         blockGrabberRight.setPosition(pair.getRight());
@@ -269,12 +269,24 @@ public class Robot {
 
     public void handleLiftMotor(Gamepad gamepad) {
 
+
+
         if(gamepad.a) {
             GrabberLiftLower();
         } else if(gamepad.y){
             GrabberLiftRaise();
         } else {
-            GrabberLiftStop();
+            //GrabberLiftStop();
+
+            int pos = motorLift.getCurrentPosition();
+
+            if(pos < 200) {
+                GrabberLiftStop();
+            } else {
+                motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                motorLift.setTargetPosition(pos);
+                motorLift.setPower(1.0);
+            }
         }
 
     }
@@ -291,6 +303,7 @@ public class Robot {
 
         motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorLift.setPower(LIFTSPEED);
+        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         if(motorLift.getCurrentPosition() >= LIFT_MOTOR_MAX_POSITION - LIFT_MOTOR_TOLERANCE) {
             motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             motorLift.setTargetPosition(LIFT_MOTOR_MAX_POSITION);
