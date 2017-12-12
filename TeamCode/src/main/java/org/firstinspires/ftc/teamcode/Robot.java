@@ -85,6 +85,7 @@ public class Robot {
 
 
     static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    static final double     REV_COUNTS_PER_MOTOR_REV = 288;     // eg: Rev Side motor
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 3.5 ;     // For figuring circumference
     public static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
@@ -92,6 +93,8 @@ public class Robot {
     static final double     DRIVE_SPEED             = 0.6;
     static final double     TURN_SPEED              = 0.5;
 
+    public static final double REV_COUNTS_PER_INCH  = (REV_COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
 
 
 
@@ -105,6 +108,8 @@ public class Robot {
 
 
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
+        motorLift.setDirection(DcMotor.Direction.REVERSE);
+
 
         motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -188,7 +193,7 @@ public class Robot {
 
     public void setLiftPosition(double inches) {
 
-        int newTarget = (int)(inches * COUNTS_PER_INCH);
+        int newTarget = (int)(inches * REV_COUNTS_PER_INCH);
         motorLift.setTargetPosition(newTarget);
 
         motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
