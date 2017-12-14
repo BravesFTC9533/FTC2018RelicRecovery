@@ -21,6 +21,8 @@ public class TeleOpTutorial extends LinearOpMode{
     private Servo armServo;
     private Servo blockLeft;
     private Servo blockRight;
+    private Servo relicRaise;
+    private Servo relicGrab;
     double motorPower = 50;
 
     @Override
@@ -31,15 +33,20 @@ public class TeleOpTutorial extends LinearOpMode{
         relicArmExtender = hardwareMap.dcMotor.get("relicArmExtender");
         blockLeft = hardwareMap.servo.get("blockLeft");
         blockRight = hardwareMap.servo.get("blockRight");
+        relicRaise = hardwareMap.servo.get("relicRaise");
+        relicGrab = hardwareMap.servo.get("relicGrab");
+
 
         //armServo = hardwareMap.servo.get("armServo");
 
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
+        relicGrab.setPosition(0);
+
         waitForStart();
 
         while (opModeIsActive()){
-            motorLeft.setPower(-gamepad1.left_stick_y * 0.5);
+            /*motorLeft.setPower(-gamepad1.left_stick_y * 0.5);
             motorRight.setPower(-gamepad1.right_stick_y * 0.5);
             relicArmExtender.setPower(gamepad2.left_trigger * 0.5);
             relicArmExtender.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -52,8 +59,9 @@ public class TeleOpTutorial extends LinearOpMode{
             if(gamepad2.right_bumper){//Close position
                 blockLeft.setPosition(0);
                blockRight.setPosition(1);
-            }
+            }*/
             idle();
+
         }
     }
 }

@@ -93,7 +93,7 @@ public class Robot {
     static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     static final double     REV_COUNTS_PER_MOTOR_REV = 288;     // eg: Rev Side motor
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 3.5 ;     // For figuring circumference
+    static final double     WHEEL_DIAMETER_INCHES   = 3.51 ;     // For figuring circumference
     public static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     DRIVE_SPEED             = 1;
