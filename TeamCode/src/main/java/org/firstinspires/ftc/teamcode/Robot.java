@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.motors.RevRoboticsCoreHexMotor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -23,6 +24,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
+import javax.sql.RowSetEvent;
+
 /**
  * Created by dmill on 10/28/2017.
  */
@@ -32,10 +35,13 @@ public class Robot {
 
     public DcMotor motorLeft = null;
     public DcMotor motorRight = null;
+    //public RevRoboticsCoreHexMotor motorLeft = null;
+    //public RevRoboticsCoreHexMotor motorRight = null;
 
     //public DcMotor relicArmExtender = null;
 
     public DcMotor motorLift = null;
+    //public RevRoboticsCoreHexMotor motorLift = null;
 
 
 
