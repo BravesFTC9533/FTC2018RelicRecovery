@@ -68,9 +68,9 @@ public class Robot {
     private static final int COLOR_SENSOR_RED_THRESHOLD = 50;
     private static final int COLOR_SENSOR_BLUE_THRESHOLD = 40;
 
-    private static final double COLOR_RETRACTED_POSITION = 1;
-    private static final double COLOR_EXTENDED_POSITION = 0.32;
-
+    private static final double COLOR_RETRACTED_POSITION = 0;
+    private static final double COLOR_EXTENDED_POSITION = 0.68;
+// Spano - Servo flipped original retracted = 1, extended = 0.32
 
     private static final double GRABBER_LEFT_OPEN_POSITION = 0;
     private static final double GRABBER_RIGHT_OPEN_POSITION = 0;
@@ -90,7 +90,8 @@ public class Robot {
     static final double     WHEEL_DIAMETER_INCHES   = 3.5 ;     // For figuring circumference
     public static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.6;
+    static final double     DRIVE_SPEED             = 1;
+    // Spano - needed to try to speed up motor with swap to Rev, original power = 0.6
     static final double     TURN_SPEED              = 0.5;
 
     public static final double REV_COUNTS_PER_INCH  = (REV_COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
@@ -108,7 +109,7 @@ public class Robot {
 
 
         motorLeft.setDirection(DcMotor.Direction.REVERSE);
-        motorLift.setDirection(DcMotor.Direction.REVERSE);
+        //motorLift.setDirection(DcMotor.Direction.REVERSE);
 
 
         motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

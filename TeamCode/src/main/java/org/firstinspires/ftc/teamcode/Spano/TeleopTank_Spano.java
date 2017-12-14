@@ -52,7 +52,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  */
 
 @TeleOp(name="Spano_TeleOp", group="Arnold_v1")
-//@Disabled
+@Disabled
 public class TeleopTank_Spano extends OpMode{
 
     /* Declare OpMode members. */
