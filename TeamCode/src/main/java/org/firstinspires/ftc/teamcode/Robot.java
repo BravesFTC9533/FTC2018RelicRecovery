@@ -93,8 +93,8 @@ public class Robot {
     static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     static final double     REV_COUNTS_PER_MOTOR_REV = 288;     // eg: Rev Side motor
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 3.51 ;     // For figuring circumference
-    public static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+    static final double     WHEEL_DIAMETER_INCHES   = 3.543 ;     // For figuring circumference
+    public static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     DRIVE_SPEED             = 1;
     // Spano - needed to try to speed up motor with swap to Rev, original power = 0.6
@@ -189,8 +189,8 @@ public class Robot {
 
 
 //        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        newLeftTarget = motorLeft.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
-        newRightTarget = motorRight.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+        newLeftTarget = motorLeft.getCurrentPosition() + (int)(leftInches * REV_COUNTS_PER_INCH);
+        newRightTarget = motorRight.getCurrentPosition() + (int)(rightInches * REV_COUNTS_PER_INCH);
         motorLeft.setTargetPosition(newLeftTarget);
         motorRight.setTargetPosition(newRightTarget);
 
