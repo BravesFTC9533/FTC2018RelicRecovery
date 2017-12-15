@@ -32,7 +32,7 @@ public class Autonomous9533 extends LinearOpMode {
 
     private static final double cryptoBoxWidth = 7.5;
     private static final long pauseTimeBetweenSteps = 250;
-    private double speed = 0.75;
+    private double speed = 1.0;
     private double fast_speed = 1.0;
 
     String currentStep = "";

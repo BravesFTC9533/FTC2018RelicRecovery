@@ -32,17 +32,12 @@ import javax.sql.RowSetEvent;
 
 public class Robot {
 
-//Mike is short for Michael
     public DcMotor motorLeft = null;
     public DcMotor motorRight = null;
-    //public RevRoboticsCoreHexMotor motorLeft = null;
-    //public RevRoboticsCoreHexMotor motorRight = null;
 
     //public DcMotor relicArmExtender = null;
 
     public DcMotor motorLift = null;
-    //public RevRoboticsCoreHexMotor motorLift = null;
-
 
 
     public Servo colorServo = null;
