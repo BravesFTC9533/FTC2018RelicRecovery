@@ -32,8 +32,8 @@ public class Autonomous9533 extends LinearOpMode {
 
     private static final double cryptoBoxWidth = 7.5;
     private static final long pauseTimeBetweenSteps = 250;
-    private double speed = 0.5;
-    private double fast_speed = 0.8;
+    private double speed = 0.75;
+    private double fast_speed = 1.0;
 
     String currentStep = "";
 
@@ -156,10 +156,10 @@ public class Autonomous9533 extends LinearOpMode {
 
         // always move towards the opposite of team color
         if(color == Robot.ColorSensed.RED) {
-            moveForward = config.color == Config.Colors.BLUE;
+            moveForward = config.color == Config.Colors.RED;
 
         } else if (color == Robot.ColorSensed.BLUE) {
-            moveForward = config.color == Config.Colors.RED;
+            moveForward = config.color == Config.Colors.BLUE;
 
         } else {
             updateStep("Retracting Arm - No color");
@@ -246,7 +246,7 @@ public class Autonomous9533 extends LinearOpMode {
     }
 
     void turn90(TurnDirection direction) {
-        double turn90Inches = 12.5;
+        double turn90Inches = (3.543 * 3.1415) * 1.09;
 
         if(direction == TurnDirection.CLOCKWISE) {
             //maneuver build for counter-clockwise, so reverse
