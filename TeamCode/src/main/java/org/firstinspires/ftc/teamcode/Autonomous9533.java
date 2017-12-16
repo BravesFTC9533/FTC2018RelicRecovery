@@ -71,10 +71,6 @@ public class Autonomous9533 extends LinearOpMode {
         telemetry.update();
 
 
-
-
-
-
         vuforiaHelper = new VuforiaHelper();
         vuforiaHelper.initVuforia(hardwareMap);
 
@@ -155,11 +151,12 @@ public class Autonomous9533 extends LinearOpMode {
         Robot.ColorSensed color = robot.SenseJewel();
 
         // always move towards the opposite of team color
+        // sensor light shines to front of robot
         if(color == Robot.ColorSensed.RED) {
-            moveForward = config.color == Config.Colors.RED;
+            moveForward = config.color == Config.Colors.BLUE;
 
         } else if (color == Robot.ColorSensed.BLUE) {
-            moveForward = config.color == Config.Colors.BLUE;
+            moveForward = config.color == Config.Colors.RED;
 
         } else {
             updateStep("Retracting Arm - No color");
@@ -246,7 +243,7 @@ public class Autonomous9533 extends LinearOpMode {
     }
 
     void turn90(TurnDirection direction) {
-        double turn90Inches = (3.543 * 3.1415) * 1.09;
+        double turn90Inches = (3.543 * 3.1415) * 1.05;
 
         if(direction == TurnDirection.CLOCKWISE) {
             //maneuver build for counter-clockwise, so reverse
@@ -300,7 +297,7 @@ public class Autonomous9533 extends LinearOpMode {
 
 
         //move backwards to wall
-        double distanceToWall = 15.0; //this should be pretty static if not overkill for red
+        double distanceToWall = 10.0; //this should be pretty static if not overkill for red
         encoderDrive(speed, -distanceToWall, -distanceToWall, 5.0);
         pause();
 
@@ -489,7 +486,7 @@ public class Autonomous9533 extends LinearOpMode {
 
 
                 if(currentSpeed < speed) {
-                    multiplier = Easing.Interpolate(runtime.seconds() / 2, Easing.Functions.CubicEaseOut);
+                    multiplier = Easing.Interpolate(runtime.seconds() * 4, Easing.Functions.CubicEaseOut);
                     currentSpeed = speed * multiplier;
                 }
 
@@ -524,10 +521,6 @@ public class Autonomous9533 extends LinearOpMode {
             }
         }
     }
-
-
-
-
 
 
 
