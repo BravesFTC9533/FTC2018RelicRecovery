@@ -472,6 +472,8 @@ public class Autonomous9533 extends LinearOpMode {
             double currentSpeed = 0;
             double multiplier = 0;
 
+            double targetLeft, targetRight, currentLeft, currentRight;
+            double differenceLeft, differenceRight;
             robot.setPower(currentSpeed , currentSpeed);
 
             // keep looping while we are still active, and there is time left, and both motors are running.
@@ -483,9 +485,16 @@ public class Autonomous9533 extends LinearOpMode {
             while (opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
                     (robot.isBusy())) {
+                targetLeft = robot.motorLeft.getTargetPosition();
+                targetRight = robot.motorRight.getTargetPosition();
+                currentLeft = robot.motorLeft.getCurrentPosition();
+                currentRight = robot.motorRight.getCurrentPosition();
+                differenceLeft = Math.abs(Math.abs(targetLeft) - Math.abs(currentLeft));
+                differenceRight = Math.abs(Math.abs(targetRight) - Math.abs(currentRight));
 
-
-                if(currentSpeed < speed) {
+                if((differenceLeft < 50 || differenceRight < 50) && currentSpeed == speed && speed >= 0.75){
+                    currentSpeed *= 0.5;
+                } else if(currentSpeed < speed) {
                     multiplier = Easing.Interpolate(runtime.seconds() * 4, Easing.Functions.CubicEaseOut);
                     currentSpeed = speed * multiplier;
                 }
