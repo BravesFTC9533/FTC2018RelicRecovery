@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -24,18 +25,22 @@ import java.util.Locale;
  */
 
 @TeleOp(name = "TeleOp", group = "Competition")
-public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler {
+public class Teleop9533 extends LinearOpMode9533 implements FtcGamePad.ButtonHandler {
 
 
-    private FtcGamePad driverGamepad;
-    private FtcGamePad operatorGamepad;
-    private Robot robot;
+    //private FtcGamePad driverGamepad;
+    //private FtcGamePad operatorGamepad;
+    //private Robot robot;
 
-    private IDrive robotDrive;
+    //private IDrive robotDrive;
 
     // State used for updating telemetry
     Orientation angles;
     Acceleration gravity;
+
+
+    int lastPositionLeft = 0;
+    int lastPositionRight = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -56,9 +61,10 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
         waitForStart();
 
-
-
         robot.retractColorArm();
+        lastPositionLeft = robot.motorLeft.getCurrentPosition();
+        lastPositionRight = robot.motorRight.getCurrentPosition();
+
 
         while(opModeIsActive()){
 
@@ -97,19 +103,38 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
         //handle buttons here.
         switch (button)
         {
-            case FtcGamePad.GAMEPAD_A:
+            case FtcGamePad.GAMEPAD_A: //counter clockwise
+                if(pressed) {
 
+                    turn90slow(Autonomous9533.TurnDirection.CLOCKWISE);
+                }
                 break;
 
-            case FtcGamePad.GAMEPAD_B:
+            case FtcGamePad.GAMEPAD_B: //clockwise
+                if(pressed) {
 
+                    turn90slow(Autonomous9533.TurnDirection.COUNTERCLOCKWISE);
+                }
                 break;
 
             case FtcGamePad.GAMEPAD_X:
+                if(pressed){
+                    lastPositionLeft = 0;
+                    lastPositionRight = 0;
+                    robot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    sleep(1000);
+                    robot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+                }
                 break;
 
             case FtcGamePad.GAMEPAD_Y:
+                if(pressed){
+                    lastPositionRight = robot.motorRight.getCurrentPosition();
+                    lastPositionLeft = robot.motorLeft.getCurrentPosition();
+
+                    robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                }
                 break;
 
             case FtcGamePad.GAMEPAD_LBUMPER:
@@ -127,6 +152,9 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
                 if(pressed) {
                     parkRobot();
                 }
+                break;
+            case FtcGamePad.GAMEPAD_BACK:
+
                 break;
 
         }
@@ -212,6 +240,9 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
         parking = false;
     }
 
+
+
+
     /*
     *  Method to perform a relative move, based on encoder counts.
     *  Encoders are not reset as the move is based on the current position.
@@ -223,9 +254,12 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
                              double timeoutS, boolean holdPosition) {
-        int newLeftTarget;
-        int newRightTarget;
 
+
+        int targetLeft, targetRight, currentRight, currentLeft;
+        int differenceLeft, differenceRight;
+
+        boolean maxed = false;
         ElapsedTime runtime = new ElapsedTime();
 
         robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -234,19 +268,26 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
 
             robot.setNewPosition(leftInches, rightInches);
 
+            currentLeft = robot.motorLeft.getCurrentPosition();
+            int newLeftTarget = currentLeft + (int)(leftInches * robot.COUNTS_PER_INCH);
+
+            int scale = newLeftTarget - currentLeft;
+
 
             // reset the timeout time and start motion.
             runtime.reset();
 
             double currentSpeed = 0;
-//            if(Math.abs(leftInches) < 2 && Math.abs(rightInches) < 2) {
-//                currentSpeed = speed;
-//            }
-
             double multiplier = 0;
+
 
             robot.setPower(currentSpeed , currentSpeed);
 
+
+            int lastPosition = 0;
+            double lastRuntime = 0;
+
+            int slowdownTick = 150;
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
             // its target position, the motion will stop.  This is "safer" in the event that the robot will
@@ -256,22 +297,46 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
             while (opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
                     (robot.isBusy())) {
+                targetLeft = robot.motorLeft.getTargetPosition();
+                targetRight =robot.motorRight.getTargetPosition();
+                currentLeft = robot.motorLeft.getCurrentPosition();
+                currentRight = robot.motorRight.getCurrentPosition();
+                differenceLeft = Math.abs(Math.abs(targetLeft) - Math.abs(currentLeft));
 
-
-                if(currentSpeed < speed) {
-                    multiplier = Easing.Interpolate(runtime.seconds() * 2, Easing.Functions.QuinticEaseOut);
+                if(maxed) {
+                    double newSpeed = Easing.Interpolate(1 - (differenceLeft / scale), Easing.Functions.QuinticEaseIn);
+                    currentSpeed = newSpeed;
+                    if(currentSpeed < 0.2) {
+                        currentSpeed = 0.2;
+                    }
+                }
+                else if(currentSpeed < speed) {
+                    multiplier = Easing.Interpolate(runtime.seconds() * 4, Easing.Functions.CubicEaseOut);
                     currentSpeed = speed * multiplier;
                 }
 
 
+                telemetry.addLine()
+                        .addData("Multiplier", "%7f", multiplier)
+                        .addData("Speed", "%7f", currentSpeed);
+
                 //telemetry.update();
 
-                if(currentSpeed > speed) {
+                if(currentSpeed >= speed) {
                     currentSpeed = speed;
+                    maxed = true;
                 }
                 robot.setPower(currentSpeed, currentSpeed);
 
 
+                // Display it for the driver.
+                telemetry.addLine().addData("Target",  "Running to %7d :%7d",
+                        targetLeft,
+                        targetRight);
+                telemetry.addLine().addData("Current",  "Running at %7d :%7d",
+                        currentLeft,
+                        currentRight);
+                telemetry.update();
             }
 
             if(holdPosition==false) {
@@ -327,12 +392,12 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
                     }
                 });
         telemetry.addLine()
-                .addData("Left", new Func<String>() {
+                .addData("Left Grab", new Func<String>() {
                     @Override public String value() {
                         return formatDouble(robot.blockGrabberLeft.getPosition());
                     }
                 })
-                .addData("Right", new Func<String>() {
+                .addData("Right Grab", new Func<String>() {
                     @Override public String value() {
                         return formatDouble(robot.blockGrabberRight.getPosition());
                     }
@@ -340,6 +405,17 @@ public class Teleop9533 extends LinearOpMode implements FtcGamePad.ButtonHandler
                 .addData("Lift", new Func<String>() {
                     @Override public String value() {
                         return formatDouble(robot.motorLift.getCurrentPosition());
+                    }
+                });
+        telemetry.addLine()
+                .addData("Left Pos", new Func<String>() {
+                    @Override public String value() {
+                        return formatDouble(robot.motorLeft.getCurrentPosition() - lastPositionLeft);
+                    }
+                })
+                .addData("Right Pos", new Func<String>() {
+                    @Override public String value() {
+                        return formatDouble(robot.motorRight.getCurrentPosition() - lastPositionRight);
                     }
                 });
     }

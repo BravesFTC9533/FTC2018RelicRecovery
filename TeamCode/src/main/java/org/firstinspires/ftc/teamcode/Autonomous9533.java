@@ -20,10 +20,10 @@ import java.util.Locale;
  */
 
 @Autonomous(name = "Autonomous", group = "Competition")
-public class Autonomous9533 extends LinearOpMode {
+public class Autonomous9533 extends LinearOpMode9533 {
 
 
-    Robot robot = null;
+    //Robot robot = null;
     VuforiaHelper vuforiaHelper = null;
     Config config = null;
 
@@ -32,10 +32,8 @@ public class Autonomous9533 extends LinearOpMode {
 
     private static final double cryptoBoxWidth = 7.5;
     private static final long pauseTimeBetweenSteps = 250;
-    private double speed = 1.0;
-    private double fast_speed = 1.0;
 
-    String currentStep = "";
+
 
     double distanceToDrive = 0;
     int leftPosition;
@@ -98,10 +96,7 @@ public class Autonomous9533 extends LinearOpMode {
 
     }
 
-    void updateStep(String step) {
-        currentStep = step;
-        telemetry.update();
-    }
+
 
     void readPictograph() {
 
@@ -242,18 +237,7 @@ public class Autonomous9533 extends LinearOpMode {
         waitForTick(pauseTimeBetweenSteps);
     }
 
-    void turn90(TurnDirection direction) {
-        double turn90Inches = (3.543 * 3.1415) * 1.05;
 
-        if(direction == TurnDirection.CLOCKWISE) {
-            //maneuver build for counter-clockwise, so reverse
-            turn90Inches = -turn90Inches;
-        }
-        updateStep("Turning 90 degrees");
-
-        encoderDrive(speed, -turn90Inches, turn90Inches, 3.0);
-        updateStep("Finished turning 90 degrees");
-    }
 
     void parkFromFront() {
         distanceToDrive += (config.color == Config.Colors.RED) ? config.distanceToCryptoBoxInchesFrontRed : config.distanceToCryptoBoxInchesFrontBlue;
@@ -454,9 +438,12 @@ public class Autonomous9533 extends LinearOpMode {
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
                              double timeoutS, boolean holdPosition) {
-        int newLeftTarget;
-        int newRightTarget;
 
+
+        int targetLeft, targetRight, currentRight, currentLeft;
+        int differenceLeft, differenceRight;
+
+        boolean maxed = false;
         ElapsedTime runtime = new ElapsedTime();
 
         robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -465,6 +452,11 @@ public class Autonomous9533 extends LinearOpMode {
 
             robot.setNewPosition(leftInches, rightInches);
 
+            currentLeft = robot.motorLeft.getCurrentPosition();
+            int newLeftTarget = currentLeft + (int)(leftInches * robot.COUNTS_PER_INCH);
+
+            int scale = newLeftTarget - currentLeft;
+
 
             // reset the timeout time and start motion.
             runtime.reset();
@@ -472,10 +464,14 @@ public class Autonomous9533 extends LinearOpMode {
             double currentSpeed = 0;
             double multiplier = 0;
 
-            double targetLeft, targetRight, currentLeft, currentRight;
-            double differenceLeft, differenceRight;
+
             robot.setPower(currentSpeed , currentSpeed);
 
+
+            int lastPosition = 0;
+            double lastRuntime = 0;
+
+            int slowdownTick = 150;
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
             // its target position, the motion will stop.  This is "safer" in the event that the robot will
@@ -486,18 +482,23 @@ public class Autonomous9533 extends LinearOpMode {
                     (runtime.seconds() < timeoutS) &&
                     (robot.isBusy())) {
                 targetLeft = robot.motorLeft.getTargetPosition();
-                targetRight = robot.motorRight.getTargetPosition();
+                targetRight =robot.motorRight.getTargetPosition();
                 currentLeft = robot.motorLeft.getCurrentPosition();
                 currentRight = robot.motorRight.getCurrentPosition();
                 differenceLeft = Math.abs(Math.abs(targetLeft) - Math.abs(currentLeft));
-                differenceRight = Math.abs(Math.abs(targetRight) - Math.abs(currentRight));
 
-                if((differenceLeft < 50 || differenceRight < 50) && currentSpeed == speed && speed >= 0.75){
-                    currentSpeed *= 0.5;
-                } else if(currentSpeed < speed) {
+                if(maxed) {
+                    double newSpeed = Easing.Interpolate(1 - (differenceLeft / scale), Easing.Functions.QuinticEaseIn);
+                    currentSpeed = newSpeed;
+                    if(currentSpeed < 0.2) {
+                        currentSpeed = 0.2;
+                    }
+                }
+                else if(currentSpeed < speed) {
                     multiplier = Easing.Interpolate(runtime.seconds() * 4, Easing.Functions.CubicEaseOut);
                     currentSpeed = speed * multiplier;
                 }
+
 
                 telemetry.addLine()
                         .addData("Multiplier", "%7f", multiplier)
@@ -505,19 +506,20 @@ public class Autonomous9533 extends LinearOpMode {
 
                 //telemetry.update();
 
-                if(currentSpeed > speed) {
+                if(currentSpeed >= speed) {
                     currentSpeed = speed;
+                    maxed = true;
                 }
                 robot.setPower(currentSpeed, currentSpeed);
 
 
                 // Display it for the driver.
                 telemetry.addLine().addData("Target",  "Running to %7d :%7d",
-                        robot.motorLeft.getTargetPosition(),
-                        robot.motorRight.getTargetPosition());
+                        targetLeft,
+                        targetRight);
                 telemetry.addLine().addData("Current",  "Running at %7d :%7d",
-                        robot.motorLeft.getCurrentPosition(),
-                        robot.motorRight.getCurrentPosition());
+                        currentLeft,
+                        currentRight);
                 telemetry.update();
             }
 

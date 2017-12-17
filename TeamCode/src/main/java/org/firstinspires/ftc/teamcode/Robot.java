@@ -86,7 +86,7 @@ public class Robot {
 
 
     static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
-    static final double     REV_COUNTS_PER_MOTOR_REV = 288;     // eg: Rev Side motor
+    public static final double     REV_COUNTS_PER_MOTOR_REV = 288;     // eg: Rev Side motor
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 3.543 ;     // For figuring circumference
     public static final double     COUNTS_PER_INCH = (REV_COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
@@ -98,7 +98,13 @@ public class Robot {
     public static final double REV_COUNTS_PER_INCH  = (REV_COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
 
+    //322
 
+
+
+    public static final double     HEADING_THRESHOLD       = 1 ;      // As tight as we can make it with an integer gyro
+    public static final double     P_TURN_COEFF            = 0.1;     // Larger is more responsive, but also less stable
+    public static final double     P_DRIVE_COEFF           = 0.15;     // Larger is more responsive, but also less stable
 
 
     public Robot(HardwareMap hardwareMap) {
