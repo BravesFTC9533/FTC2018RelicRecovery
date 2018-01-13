@@ -248,7 +248,7 @@ public class Robot {
 
 
     Pair<Double,Double> grab = new Pair<>(0.0, 1.0);
-    Pair<Double,Double> loose = new Pair<>(0.15, 0.65);
+    Pair<Double,Double> loose = new Pair<>(0.17, 0.63);
     Pair<Double,Double> open = new Pair<>(0.30, 0.50);
     Pair<Double,Double> start = new Pair<>(1.0, 0.0);
 
