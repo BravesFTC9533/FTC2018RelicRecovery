@@ -179,7 +179,7 @@ public class Robot {
     }
     public void setPower(double left, double right) {
         motorLeft.setPower(left);
-        motorRight.setPower(right);
+        motorRight.setPower(right * 0.95);
 
     }
     public void  setNewPosition(double leftInches, double rightInches) {
