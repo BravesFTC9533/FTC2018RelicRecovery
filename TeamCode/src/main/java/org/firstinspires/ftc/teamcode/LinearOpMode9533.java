@@ -22,7 +22,7 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
 
 
     public void turn90(Autonomous9533.TurnDirection direction) {
-        double turn90Inches = (3.543 * 3.1415) * (318/robot.REV_COUNTS_PER_MOTOR_REV);
+        double turn90Inches = (3.51 * 3.1415) * (318/robot.REV_COUNTS_PER_MOTOR_REV);
 
         if(direction == Autonomous9533.TurnDirection.CLOCKWISE) {
             //maneuver build for counter-clockwise, so reverse

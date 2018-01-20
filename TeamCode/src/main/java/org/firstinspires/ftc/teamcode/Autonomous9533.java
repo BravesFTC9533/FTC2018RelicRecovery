@@ -249,12 +249,12 @@ public class Autonomous9533 extends LinearOpMode9533 {
             distanceToDrive = -distanceToDrive;
         }
 
-        encoderDrive(speed, distanceToDrive, distanceToDrive, 7.0);
+        encoderDrive(speed * 0.75, distanceToDrive, distanceToDrive, 7.0);
         updateStep("Finished park maneuver");
 
         pause();
 
-        turn90(TurnDirection.COUNTERCLOCKWISE);
+        turn90slow(TurnDirection.COUNTERCLOCKWISE);
 
         pause();
         double placeBlockDistance = 15;
