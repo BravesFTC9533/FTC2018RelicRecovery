@@ -185,12 +185,19 @@ public class Autonomous9533 extends LinearOpMode9533 {
 
     }
 
-    void backUp(double distance) {
-
+    void backUp(double distance, double timeOutS) {
         pause();
         updateStep("Back up");
-        encoderDrive(0.8, -distance, -distance, 2.0);
+        encoderDrive(0.8, -distance, -distance, timeOutS);
         updateStep("Finished Back up");
+    }
+    void backUp(double distance) {
+
+        backUp(distance, 2.0);
+//        pause();
+//        updateStep("Back up");
+//        encoderDrive(0.8, -distance, -distance, 2.0);
+//        updateStep("Finished Back up");
     }
 
     void runProgram() {
@@ -272,7 +279,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
             distance = -distance;
         }
         updateStep("Driving off of balance board");
-        encoderDrive(speed, distance, distance, 7.0);
+        encoderDrive(speed, distance, distance, 5.0);
         updateStep("Finished driving off of balance board");
         pause();
 
@@ -282,11 +289,11 @@ public class Autonomous9533 extends LinearOpMode9533 {
 
         //move backwards to wall
         double distanceToWall = 10.0; //this should be pretty static if not overkill for red
-        encoderDrive(speed, -distanceToWall, -distanceToWall, 5.0);
+        encoderDrive(speed, -distanceToWall, -distanceToWall, 2.0);
         pause();
 
         updateStep("Lower block some");
-        encoderLift(1.0);
+        encoderLift(1.5);
         pause();
 
         //move to correct position in front of crypto wall
@@ -300,8 +307,8 @@ public class Autonomous9533 extends LinearOpMode9533 {
         pause();
 
 
-        double distanceIntoWall = 10.0;
-        encoderDrive(speed, distanceIntoWall, distanceIntoWall, 5.0);
+        double distanceIntoWall = 8.0;
+        encoderDrive(speed, distanceIntoWall, distanceIntoWall, 2.0);
         pause();
 
 
@@ -310,8 +317,8 @@ public class Autonomous9533 extends LinearOpMode9533 {
     void dropCryptoblock() {
 
 
-        backUp(1.0);
-        pause();
+//        backUp(1.0);
+//        pause();
 
         encoderLift(1.0);
         updateStep("Drop block");
@@ -328,10 +335,10 @@ public class Autonomous9533 extends LinearOpMode9533 {
         pause();
 
         robot.GrabberStart();
-        backUp(2.0);
+        backUp(1.0, 1.0);
         //backup negative is move forward..
-        backUp(-5.0);
-        backUp(2.0);
+        backUp(-5.0, 1.0);
+        backUp(1.0, 1.0);
 
         //        while(opModeIsActive()) {
 //            robot.GrabberOpen();
@@ -420,129 +427,13 @@ public class Autonomous9533 extends LinearOpMode9533 {
     }
 
 
-
-    public void encoderDrive(double speed,
-                             double leftInches, double rightInches,
-                             double timeoutS) {
-        encoderDrive(speed, leftInches, rightInches, timeoutS, false);
-    }
-
-    /*
-    *  Method to perform a relative move, based on encoder counts.
-    *  Encoders are not reset as the move is based on the current position.
-    *  Move will stop if any of three conditions occur:
-    *  1) Move gets to the desired position
-    *  2) Move runs out of time
-    *  3) Driver stops the opmode running.
-    */
-    public void encoderDrive(double speed,
-                             double leftInches, double rightInches,
-                             double timeoutS, boolean holdPosition) {
-
-
-        double maxSpeed = 0.95;
-        if(speed > maxSpeed) {
-            speed = maxSpeed;
-        }
-        int targetLeft, targetRight, currentRight, currentLeft;
-        int differenceLeft, differenceRight;
-
-
-        boolean accelerate = (Math.abs(leftInches) > 5) || (Math.abs(rightInches) > 5);
-        boolean maxed = false;
-        ElapsedTime runtime = new ElapsedTime();
-
-        robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        // Ensure that the opmode is still active
-        if (opModeIsActive()) {
-
-            robot.setNewPosition(leftInches, rightInches);
-
-            currentLeft = robot.motorLeft.getCurrentPosition();
-            int newLeftTarget = currentLeft + (int)(leftInches * robot.COUNTS_PER_INCH);
-
-            int scale = newLeftTarget - currentLeft;
-
-
-            // reset the timeout time and start motion.
-            runtime.reset();
-
-            double currentSpeed = 0;
-            double multiplier = 0;
-
-
-            robot.setPower(currentSpeed , currentSpeed);
-
-
-            int lastPosition = 0;
-            double lastRuntime = 0;
-
-            int slowdownTick = 150;
-            // keep looping while we are still active, and there is time left, and both motors are running.
-            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
-            // its target position, the motion will stop.  This is "safer" in the event that the robot will
-            // always end the motion as soon as possible.
-            // However, if you require that BOTH motors have finished their moves before the robot continues
-            // onto the next step, use (isBusy() || isBusy()) in the loop test.
-            while (opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
-                    (robot.isBusy())) {
-                targetLeft = robot.motorLeft.getTargetPosition();
-                targetRight =robot.motorRight.getTargetPosition();
-                currentLeft = robot.motorLeft.getCurrentPosition();
-                currentRight = robot.motorRight.getCurrentPosition();
-                differenceLeft = Math.abs(Math.abs(targetLeft) - Math.abs(currentLeft));
-
-                if(accelerate) {
-                    if (maxed) {
-                        double newSpeed = 1 - (Easing.Interpolate(1 - (differenceLeft / scale), Easing.Functions.QuinticEaseIn));
-
-                        currentSpeed = speed * newSpeed;
-                        if (currentSpeed < 0.4) {
-                            currentSpeed = 0.4;
-                        }
-                    } else if (currentSpeed < speed) {
-                        multiplier = Easing.Interpolate(runtime.seconds() * 4, Easing.Functions.CubicEaseOut);
-                        currentSpeed = speed * multiplier;
-                    }
-
-                } else {
-                    currentSpeed = speed;
-                }
-
-
-                telemetry.addLine()
-                        .addData("Multiplier", "%7f", multiplier)
-                        .addData("Speed", "%7f", currentSpeed);
-
-                //telemetry.update();
-
-                if(currentSpeed >= speed) {
-                    currentSpeed = speed;
-                    maxed = true;
-                }
-                robot.setPower(currentSpeed, currentSpeed);
-
-
-                // Display it for the driver.
-                telemetry.addLine().addData("Target",  "Running to %7d :%7d",
-                        targetLeft,
-                        targetRight);
-                telemetry.addLine().addData("Current",  "Running at %7d :%7d",
-                        currentLeft,
-                        currentRight);
-                telemetry.update();
-            }
-
-            if(holdPosition==false) {
-                // Stop all motion;
-                robot.stop();
-
-                // Turn off RUN_TO_POSITION
-                robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }
-        }
-    }
+//
+//    public void encoderDrive(double speed,
+//                             double leftInches, double rightInches,
+//                             double timeoutS) {
+//        encoderDrive(speed, leftInches, rightInches, timeoutS, false);
+//    }
+//
 
 
 
