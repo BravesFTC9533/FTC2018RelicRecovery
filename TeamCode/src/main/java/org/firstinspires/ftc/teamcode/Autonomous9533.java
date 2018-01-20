@@ -49,7 +49,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
 
 
         robot = new Robot(hardwareMap);
-        robot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.stop();
 
         config = new Config(hardwareMap.appContext);

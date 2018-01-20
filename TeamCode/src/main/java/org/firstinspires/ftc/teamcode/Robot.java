@@ -4,27 +4,15 @@ import android.graphics.Color;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.hardware.motors.RevRoboticsCoreHexMotor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.hardware.configuration.MotorConfiguration;
-import com.qualcomm.robotcore.hardware.configuration.MotorConfigurationType;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-import javax.sql.RowSetEvent;
 
 /**
  * Created by dmill on 10/28/2017.
@@ -66,40 +54,24 @@ public class Robot {
     }
 
 
-    private static final int COLOR_SENSOR_RED_THRESHOLD = 50;
-    private static final int COLOR_SENSOR_BLUE_THRESHOLD = 40;
-
     private static final double COLOR_RETRACTED_POSITION = 0;
     private static final double COLOR_EXTENDED_POSITION = 0.68;
-// Spano - Servo flipped original retracted = 1, extended = 0.32
-
-    private static final double GRABBER_LEFT_OPEN_POSITION = 0;
-    private static final double GRABBER_RIGHT_OPEN_POSITION = 0;
-
-    private static final double GRABBER_LEFT_CLOSE_POSITION = 0;
-    private static final double GRABBER_RIGHT_CLOSE_POSITION = 0;
-
 
     private static final int LIFT_MOTOR_MAX_POSITION = 5000;
     private static final int LIFT_MOTOR_TOLERANCE = 400;
 
 
 
-    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     public static final double     REV_COUNTS_PER_MOTOR_REV = 288;     // eg: Rev Side motor
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 3.543 ;     // For figuring circumference
     public static final double     COUNTS_PER_INCH = (REV_COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     DRIVE_SPEED             = 1;
-    // Spano - needed to try to speed up motor with swap to Rev, original power = 0.6
     static final double     TURN_SPEED              = 0.5;
 
     public static final double REV_COUNTS_PER_INCH  = (REV_COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-
-    //322
-
 
 
     public static final double     HEADING_THRESHOLD       = 1 ;      // As tight as we can make it with an integer gyro
@@ -112,8 +84,6 @@ public class Robot {
         motorLeft = hardwareMap.dcMotor.get("motorLeft");
         //relicArmExtender = hardwareMap.dcMotor.get("relicArmExtender");
         motorLift = hardwareMap.dcMotor.get("lift");
-
-
 
         motorRight.setDirection(DcMotor.Direction.REVERSE);
 
@@ -303,13 +273,6 @@ public class Robot {
 
     }
 
-
-    public void GrabberToInches(double inches) {
-        setLiftPosition(inches);
-        motorLift.setPower(LIFTSPEED);
-
-
-    }
 
     public void GrabberLiftRaise() {
 
