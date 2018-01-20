@@ -66,7 +66,7 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
             robot.setPower(speed , speed);
         }
         robot.stop();
-        robot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
 

@@ -131,7 +131,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
     void knockOffJewel() {
 
         double movement = 2.5; //how far to move in inches
-        double speed = 0.35; //how fast to move
+        double speed = 0.65; //how fast to move
         boolean moveForward = false;
         double timeoutS = 4.0; //how long before timing out movement
 
@@ -169,7 +169,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
         double right = robot.motorRight.getCurrentPosition();
 
         updateStep("Moving to knock off jewel");
-        encoderDrive(speed, movement, movement, timeoutS, true);
+        encoderDrive(speed, movement, 0, timeoutS, true);
 
         waitForTick(750);
         updateStep("Retracting Arm");
@@ -180,7 +180,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
 //        double moveLeft = (left - robot.motorLeft.getCurrentPosition()) / robot.COUNTS_PER_INCH;
 //        double moveRight = (right - robot.motorRight.getCurrentPosition()) / robot.COUNTS_PER_INCH;
 
-        encoderDrive(speed, -movement, -movement, timeoutS, true);
+        encoderDrive(speed, -movement, 0, timeoutS, true);
         //encoderDrive(speed, moveLeft, moveRight, timeoutS, true);
 
     }
@@ -189,7 +189,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
 
         pause();
         updateStep("Back up");
-        encoderDrive(0.5, -distance, -distance, 5.0);
+        encoderDrive(0.8, -distance, -distance, 2.0);
         updateStep("Finished Back up");
     }
 
@@ -249,17 +249,17 @@ public class Autonomous9533 extends LinearOpMode9533 {
             distanceToDrive = -distanceToDrive;
         }
 
-        encoderDrive(speed * 0.75, distanceToDrive, distanceToDrive, 7.0);
+        encoderDrive(speed, distanceToDrive, distanceToDrive, 7.0);
         updateStep("Finished park maneuver");
 
         pause();
 
-        turn90slow(TurnDirection.COUNTERCLOCKWISE);
+        turn90(TurnDirection.COUNTERCLOCKWISE);
 
         pause();
-        double placeBlockDistance = 15;
+        double placeBlockDistance = 12;
         updateStep("Parking");
-        encoderDrive(speed, placeBlockDistance, placeBlockDistance, 5.0);
+        encoderDrive(speed, placeBlockDistance, placeBlockDistance, 4.0);
         updateStep("Finished Parking");
     }
 
@@ -440,9 +440,15 @@ public class Autonomous9533 extends LinearOpMode9533 {
                              double timeoutS, boolean holdPosition) {
 
 
+        double maxSpeed = 0.95;
+        if(speed > maxSpeed) {
+            speed = maxSpeed;
+        }
         int targetLeft, targetRight, currentRight, currentLeft;
         int differenceLeft, differenceRight;
 
+
+        boolean accelerate = (Math.abs(leftInches) > 5) || (Math.abs(rightInches) > 5);
         boolean maxed = false;
         ElapsedTime runtime = new ElapsedTime();
 
@@ -487,16 +493,21 @@ public class Autonomous9533 extends LinearOpMode9533 {
                 currentRight = robot.motorRight.getCurrentPosition();
                 differenceLeft = Math.abs(Math.abs(targetLeft) - Math.abs(currentLeft));
 
-                if(maxed) {
-                    double newSpeed = Easing.Interpolate(1 - (differenceLeft / scale), Easing.Functions.QuinticEaseIn);
-                    currentSpeed = newSpeed;
-                    if(currentSpeed < 0.2) {
-                        currentSpeed = 0.2;
+                if(accelerate) {
+                    if (maxed) {
+                        double newSpeed = 1 - (Easing.Interpolate(1 - (differenceLeft / scale), Easing.Functions.QuinticEaseIn));
+
+                        currentSpeed = speed * newSpeed;
+                        if (currentSpeed < 0.4) {
+                            currentSpeed = 0.4;
+                        }
+                    } else if (currentSpeed < speed) {
+                        multiplier = Easing.Interpolate(runtime.seconds() * 4, Easing.Functions.CubicEaseOut);
+                        currentSpeed = speed * multiplier;
                     }
-                }
-                else if(currentSpeed < speed) {
-                    multiplier = Easing.Interpolate(runtime.seconds() * 4, Easing.Functions.CubicEaseOut);
-                    currentSpeed = speed * multiplier;
+
+                } else {
+                    currentSpeed = speed;
                 }
 
 

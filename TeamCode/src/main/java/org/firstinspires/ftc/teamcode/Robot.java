@@ -145,11 +145,11 @@ public class Robot {
     }
 
     public boolean isBusy() {
-        return motorLeft.isBusy() && motorRight.isBusy();
+        return motorLeft.isBusy() || motorRight.isBusy();
     }
     public void setPower(double left, double right) {
         motorLeft.setPower(left);
-        motorRight.setPower(right * 0.95);
+        motorRight.setPower(right);
 
     }
     public void  setNewPosition(double leftInches, double rightInches) {
