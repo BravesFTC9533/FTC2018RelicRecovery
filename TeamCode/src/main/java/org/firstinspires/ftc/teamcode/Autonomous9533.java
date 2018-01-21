@@ -31,7 +31,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
     RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.UNKNOWN;
 
     private static final double cryptoBoxWidth = 7.5;
-    private static final long pauseTimeBetweenSteps = 250;
+    private static final long pauseTimeBetweenSteps = 100;
 
 
 
@@ -307,7 +307,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
         pause();
 
 
-        double distanceIntoWall = 8.0;
+        double distanceIntoWall = 9.0;
         encoderDrive(speed, distanceIntoWall, distanceIntoWall, 2.0);
         pause();
 
@@ -335,10 +335,10 @@ public class Autonomous9533 extends LinearOpMode9533 {
         pause();
 
         robot.GrabberStart();
-        backUp(1.0, 1.0);
+        backUp(2.0, 1.0);
         //backup negative is move forward..
-        backUp(-5.0, 1.0);
-        backUp(1.0, 1.0);
+        //backUp(-5.0, 1.0);
+        //backUp(1.0, 1.0);
 
         //        while(opModeIsActive()) {
 //            robot.GrabberOpen();
