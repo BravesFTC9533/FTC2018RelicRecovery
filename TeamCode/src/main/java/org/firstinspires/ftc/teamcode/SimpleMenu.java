@@ -168,16 +168,30 @@ public class SimpleMenu {
 
     public void displayMenu() {
         Option o;
+        int loops = 1;
+
+        if(this.gamepad.right_bumper) {
+            loops *= 10;
+        }
+        if(this.gamepad.left_bumper) {
+            loops *= 10;
+        }
+
+
         if (this.checkButton(this.gamepad.dpad_down, 1)) {
             this.currentOption = this.currentOption < this.options.size() - 1 ? ++this.currentOption : 0;
         } else if (this.checkButton(this.gamepad.dpad_up, 0)) {
             this.currentOption = this.currentOption > 0 ? --this.currentOption : this.options.size() - 1;
         } else if (this.checkButton(this.gamepad.dpad_left || this.gamepad.b, 2)) {
             o = this.options.get(this.currentOption);
-            o.choiceIndex = o.choiceIndex > 0 ? --o.choiceIndex : o.getNumChoices() - 1;
+            for(int i = 0;i<loops;i++) {
+                o.choiceIndex = o.choiceIndex > 0 ? --o.choiceIndex : o.getNumChoices() - 1;
+            }
         } else if (this.checkButton(this.gamepad.dpad_right || this.gamepad.a, 3)) {
             o = this.options.get(this.currentOption);
-            o.choiceIndex = o.choiceIndex < o.getNumChoices() - 1 ? ++o.choiceIndex : 0;
+            for(int i = 0;i<loops;i++) {
+                o.choiceIndex = o.choiceIndex < o.getNumChoices() - 1 ? ++o.choiceIndex : 0;
+            }
         }
         this.telemetry.addData("Menu", (Object)this.menuTitle);
         int count = 0;

@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -18,11 +20,18 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
     protected String currentStep = "";
     protected double speed = 0.0;
     protected double fast_speed = 1.0;
-    protected double turn_speed = 0.75;
+    protected double turn_speed = 0.5;
 
 
-    public void turn90(Autonomous9533.TurnDirection direction) {
-        double turn90Inches = (3.51 * 3.1415) * (318/robot.REV_COUNTS_PER_MOTOR_REV);
+
+
+    DcMotorEx motorExLeft;
+    DcMotorEx motorExRight;
+
+
+
+    public void turn90Old(Autonomous9533.TurnDirection direction) {
+        double turn90Inches = (3.51 * 3.1415) * (313/robot.REV_COUNTS_PER_MOTOR_REV);
 
         if(direction == Autonomous9533.TurnDirection.CLOCKWISE) {
             //maneuver build for counter-clockwise, so reverse
@@ -33,6 +42,30 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
         encoderDrive(turn_speed, -turn90Inches, turn90Inches, 5.0);
         updateStep("Finished turning 90 degrees");
     }
+
+
+    public void turn90(Autonomous9533.TurnDirection direction) {
+        PIDCoefficients pidCurrent = motorExLeft.getPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
+        PIDCoefficients pidNew = new PIDCoefficients(1.0, 0, 0);
+
+        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
+        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
+
+        double turn90Inches = (3.51 * 3.1415) * (313/robot.REV_COUNTS_PER_MOTOR_REV);
+
+        if(direction == Autonomous9533.TurnDirection.CLOCKWISE) {
+            //maneuver build for counter-clockwise, so reverse
+            turn90Inches = -turn90Inches;
+        }
+        updateStep("Turning 90 degrees");
+
+        encoderDriveBasic(1.0, -turn90Inches, turn90Inches, 10.0);
+        updateStep("Finished turning 90 degrees");
+        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidCurrent);
+        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidCurrent);
+
+    }
+
 
     public void turn90slow(Autonomous9533.TurnDirection direction) {
         //double turn90Inches = (3.543 * 3.1415) * (318/robot.REV_COUNTS_PER_MOTOR_REV);
@@ -67,6 +100,64 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
         }
         robot.stop();
         robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+
+
+    public void encoderDriveBasic(double speed,
+                                  double leftInches, double rightInches,
+                                  double timeoutS) {
+        int newLeftTarget;
+        int newRightTarget;
+
+        ElapsedTime runtime = new ElapsedTime();
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newLeftTarget = robot.motorLeft.getCurrentPosition() + (int)(leftInches * robot.REV_COUNTS_PER_INCH);
+            newRightTarget = robot.motorRight.getCurrentPosition() + (int)(rightInches * robot.REV_COUNTS_PER_INCH);
+            robot.motorLeft.setTargetPosition(newLeftTarget);
+            robot.motorRight.setTargetPosition(newRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+//            robot.motorLeft.setPower(Math.abs(speed));
+//            robot.motorRight.setPower(Math.abs(speed));
+            robot.setPower(Math.abs(speed), Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.motorLeft.isBusy() || robot.motorRight.isBusy())) {
+
+                // Display it for the driver.
+//                telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
+//                telemetry.addData("Path2",  "Running at %7d :%7d",
+//                        robot.motorLeft.getCurrentPosition(),
+//                        robot.motorRight.getCurrentPosition());
+//                telemetry.update();
+            }
+
+            // Stop all motion;
+            robot.motorLeft.setPower(0);
+            robot.motorRight.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            robot.motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            //  sleep(250);   // optional pause after each move
+        }
     }
 
 
@@ -156,7 +247,7 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
                 if(accelerate) {
                     if (maxed) {
 
-                        if(differenceLeft < distanceToMoveTicks * .3) {
+                        if(differenceLeft < distanceToMoveTicks * .5) {
                             currentSpeed = speed * .5;
                         }
 

@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Func;
@@ -34,6 +36,9 @@ public class Autonomous9533 extends LinearOpMode9533 {
     private static final long pauseTimeBetweenSteps = 100;
 
 
+    double NEW_P = 10.0;
+    double NEW_I = 0.05;
+    double NEW_D = 8.0;
 
     double distanceToDrive = 0;
     int leftPosition;
@@ -56,6 +61,16 @@ public class Autonomous9533 extends LinearOpMode9533 {
         config.Read();
 
         speed = config.speed;
+
+
+        motorExLeft = (DcMotorEx)robot.motorLeft;
+        motorExRight = (DcMotorEx)robot.motorRight;
+
+
+        motorExLeft.setTargetPositionTolerance(2);
+        motorExRight.setTargetPositionTolerance(2);
+
+        updatePID();
 
 
         telemetry.addData("**** PLEASE WAIT FOR VUFORIA TO INIT ****", "");
@@ -97,6 +112,11 @@ public class Autonomous9533 extends LinearOpMode9533 {
     }
 
 
+    void updatePID() {
+        PIDCoefficients pidNew = new PIDCoefficients(NEW_P, NEW_I, NEW_D);
+        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
+        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
+    }
 
     void readPictograph() {
 
@@ -335,7 +355,12 @@ public class Autonomous9533 extends LinearOpMode9533 {
         pause();
 
         robot.GrabberStart();
+        robot.pushBlockOpen();
+        sleep(500);
+        robot.pushBlockClose();
+
         backUp(2.0, 1.0);
+
         //backup negative is move forward..
         //backUp(-5.0, 1.0);
         //backUp(1.0, 1.0);
