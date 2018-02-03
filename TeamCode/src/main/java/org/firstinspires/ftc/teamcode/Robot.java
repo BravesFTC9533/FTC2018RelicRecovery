@@ -35,6 +35,8 @@ public class Robot {
     public Servo blockGrabberLeft = null;
     public Servo blockGrabberRight = null;
 
+    public Servo blockPush = null;
+
     public DigitalChannel touchSensor = null;
 
 
@@ -60,7 +62,8 @@ public class Robot {
     private static final int LIFT_MOTOR_MAX_POSITION = 5000;
     private static final int LIFT_MOTOR_TOLERANCE = 400;
 
-
+    private static final double PUSHER_RETRACTED_POSITION = 1;
+    private static final double PUSHER_EXTENDED_POSITION = 0.15;
 
     public static final double     REV_COUNTS_PER_MOTOR_REV = 288;     // eg: Rev Side motor
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
@@ -104,6 +107,7 @@ public class Robot {
         blockGrabberLeft = hardwareMap.servo.get("blockLeft");
         blockGrabberRight = hardwareMap.servo.get("blockRight");
 
+        blockPush = hardwareMap.servo.get("blockPush");
 
         // get a reference to our digitalTouch object.
         touchSensor = hardwareMap.get(DigitalChannel.class, "touch");
@@ -193,6 +197,29 @@ public class Robot {
 
     }
 
+    public void pushBlockOpen() {
+        blockPush.setPosition(PUSHER_EXTENDED_POSITION);
+    }
+
+    public void pushBlockClose(){
+        blockPush.setPosition(PUSHER_RETRACTED_POSITION);
+    }
+
+    public void waitForTick(long periodMs) {
+
+        sleep(periodMs);
+        // sleep for the remaining portion of the regular cycle period.
+//        if ( opModeIsActive()) {
+//            try {
+//                Thread.sleep(periodMs);
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+//        }
+
+        // Reset the cycle clock for the next pass.
+        //runtime.reset();
+    }
 
     public ColorSensed SenseJewel() {
 

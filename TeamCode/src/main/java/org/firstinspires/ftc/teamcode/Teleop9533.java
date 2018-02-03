@@ -162,6 +162,22 @@ public class Teleop9533 extends LinearOpMode9533 implements FtcGamePad.ButtonHan
 
     }
 
+    public void waitForTick(long periodMs) {
+
+        sleep(periodMs);
+        // sleep for the remaining portion of the regular cycle period.
+//        if ( opModeIsActive()) {
+//            try {
+//                Thread.sleep(periodMs);
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+//        }
+
+        // Reset the cycle clock for the next pass.
+        //runtime.reset();
+    }
+
     private void handleOperatorGamepad(FtcGamePad gamepad, int button, boolean pressed) {
 
 
@@ -171,7 +187,11 @@ public class Teleop9533 extends LinearOpMode9533 implements FtcGamePad.ButtonHan
                 // used for cryptoblock lift
                 break;
             case FtcGamePad.GAMEPAD_B:
-
+                if(pressed){
+                    robot.pushBlockOpen();
+                } else {
+                    robot.pushBlockClose();
+                }
                 break;
             case FtcGamePad.GAMEPAD_X:
 
