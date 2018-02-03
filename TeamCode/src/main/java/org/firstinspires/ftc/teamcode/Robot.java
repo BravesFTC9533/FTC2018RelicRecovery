@@ -63,7 +63,7 @@ public class Robot {
     private static final int LIFT_MOTOR_TOLERANCE = 400;
 
     private static final double PUSHER_RETRACTED_POSITION = 1;
-    private static final double PUSHER_EXTENDED_POSITION = 0.15;
+    private static final double PUSHER_EXTENDED_POSITION = 0.0;
 
     public static final double     REV_COUNTS_PER_MOTOR_REV = 288;     // eg: Rev Side motor
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
