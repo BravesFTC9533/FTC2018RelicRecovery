@@ -4,12 +4,7 @@ package org.firstinspires.ftc.teamcode;
  * Created by dmill on 11/4/2017.
  */
 
-interface IDrive {
 
-    boolean getIsReverse();
-    void setIsReverse(boolean value);
-    void handle();
-}
 
 
 class GTADrive implements IDrive {
