@@ -1,8 +1,12 @@
-cd "%userprofile%\AppData\Local\Android\sdk\platform-tools"
+
+
+pushd "%userprofile%\AppData\Local\Android\sdk\platform-tools"
 
 adb disconnect
 
 adb tcpip 5555
 adb connect 192.168.49.1
+
+popd
 
 PAUSE 
