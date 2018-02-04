@@ -13,9 +13,11 @@ public class MecanumDrive implements IDrive {
     private final FtcGamePad driverGamepad;
     private final RobotV2 robot;
 
+    private static final double MIN_SPEED = 0.2;
+
     boolean reverse = false;
 
-    MecanumDrive(RobotV2 robot, FtcGamePad driveGamepad){
+    public MecanumDrive(RobotV2 robot, FtcGamePad driveGamepad){
         this.driverGamepad = driveGamepad;
         this.robot = robot;
     }
@@ -36,9 +38,18 @@ public class MecanumDrive implements IDrive {
 
         h = -driverGamepad.getLeftStickX();
         v = -driverGamepad.getLeftStickY();
-        r = driverGamepad.getRightStickX();
+        r = -driverGamepad.getRightStickX();
 
 
+        if(Math.abs(h) < MIN_SPEED) {
+            h = 0;
+        }
+        if(Math.abs(v) < MIN_SPEED) {
+            v = 0;
+        }
+        if(Math.abs(r) < MIN_SPEED){
+            r = 0;
+        }
 
         if(getIsReverse()) {
             h *= -1;
@@ -74,6 +85,8 @@ public class MecanumDrive implements IDrive {
             backRight = scalePower(backRight, max);
         }
 
+
+        robot.Drive(frontLeft, frontRight, backLeft, backRight);
 
 
     }
