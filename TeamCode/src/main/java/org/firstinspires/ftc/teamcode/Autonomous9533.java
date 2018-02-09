@@ -355,10 +355,11 @@ public class Autonomous9533 extends LinearOpMode9533 {
         pause();
 
         robot.GrabberStart();
-        robot.pushBlockOpen();
+        /*robot.pushBlockOpen();
         sleep(500);
         robot.pushBlockClose();
-
+        */
+        encoderDrive(0.8, 5.0, 5.0,1.0);
         backUp(2.0, 1.0);
 
         //backup negative is move forward..
