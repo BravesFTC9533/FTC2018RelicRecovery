@@ -174,6 +174,7 @@ public class Robot {
         ((DcMotorEx)motorLeft).setPIDCoefficients(runMode, new_pid);
         ((DcMotorEx)motorRight).setPIDCoefficients(runMode, new_pid);
 
+    }
     public PIDCoefficients GetPIDCoefficients(DcMotor.RunMode runMode) {
         return  ((DcMotorEx)motorLeft).getPIDCoefficients(runMode);
     }
