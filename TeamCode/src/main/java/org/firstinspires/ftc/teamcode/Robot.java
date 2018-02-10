@@ -6,9 +6,12 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
@@ -22,7 +25,7 @@ public class Robot {
 
     public DcMotor motorLeft = null;
     public DcMotor motorRight = null;
-
+    public DcMotorEx motorLiftEx = null;
     //public DcMotor relicArmExtender = null;
 
     public DcMotor motorLift = null;
@@ -59,7 +62,7 @@ public class Robot {
     private static final double COLOR_RETRACTED_POSITION = 0;
     private static final double COLOR_EXTENDED_POSITION = 0.68;
 
-    private static final int LIFT_MOTOR_MAX_POSITION = 5000;
+    private static final int LIFT_MOTOR_MAX_POSITION = 1135;
     private static final int LIFT_MOTOR_TOLERANCE = 400;
 
     private static final double PUSHER_RETRACTED_POSITION = 0.0;
@@ -88,17 +91,24 @@ public class Robot {
         //relicArmExtender = hardwareMap.dcMotor.get("relicArmExtender");
         motorLift = hardwareMap.dcMotor.get("lift");
 
+//        motorLiftEx = (DcMotorEx)motorLift;
+//
+//        PIDCoefficients new_pid = new PIDCoefficients(40, 1, 40);
+//        motorLiftEx.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new_pid);
+//        motorLiftEx.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new_pid);
+
+
         motorRight.setDirection(DcMotor.Direction.REVERSE);
 
+        //1135
 
         motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //relicArmExtender.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         motorLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER );
 
         colorServo = hardwareMap.servo.get("colorServo");
         colorSensor = hardwareMap.colorSensor.get("colorSensor");
@@ -144,8 +154,28 @@ public class Robot {
     public void stop() {
         motorLeft.setPower(0);
         motorRight.setPower(0);
-        //motorLift.setPower(0);
-        //relicArmExtender.setPower(0);
+        motorLift.setPower(0);
+
+    }
+
+    public DcMotor.RunMode GetMode() {
+        return motorLeft.getMode();
+    }
+
+    public void SetMode(DcMotor.RunMode runMode) {
+        motorLeft.setMode(runMode);
+        motorRight.setMode(runMode);
+    }
+
+
+    public void SetPIDCoefficients(DcMotor.RunMode runMode, double new_p, double new_i, double new_d) {
+        PIDCoefficients new_pid = new PIDCoefficients(new_p, new_i, new_d);
+
+        ((DcMotorEx)motorLeft).setPIDCoefficients(runMode, new_pid);
+        ((DcMotorEx)motorRight).setPIDCoefficients(runMode, new_pid);
+
+    public PIDCoefficients GetPIDCoefficients(DcMotor.RunMode runMode) {
+        return  ((DcMotorEx)motorLeft).getPIDCoefficients(runMode);
     }
 
     public boolean isBusy() {
@@ -172,11 +202,17 @@ public class Robot {
         setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
+    public void setLiftToZero() {
+        motorLift.setTargetPosition(0);
+        motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorLift.setPower(LIFTSPEED);
+
+    }
+
     public void setLiftPosition(double inches) {
 
         int newTarget = (int)(inches * REV_COUNTS_PER_INCH);
         motorLift.setTargetPosition(newTarget);
-
         motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
     }
@@ -285,17 +321,7 @@ public class Robot {
         } else if(gamepad.y){
             GrabberLiftRaise();
         } else {
-            //GrabberLiftStop();
-
-            int pos = motorLift.getCurrentPosition();
-
-            if(pos < 200) {
-                GrabberLiftStop();
-            } else {
-                motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                motorLift.setTargetPosition(pos);
-                motorLift.setPower(1.0);
-            }
+            GrabberLiftStop();
         }
 
     }
@@ -303,40 +329,27 @@ public class Robot {
 
     public void GrabberLiftRaise() {
 
-        motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorLift.setPower(LIFTSPEED);
-        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if(motorLift.getCurrentPosition() >= LIFT_MOTOR_MAX_POSITION - LIFT_MOTOR_TOLERANCE) {
-            motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            motorLift.setTargetPosition(LIFT_MOTOR_MAX_POSITION);
+        motorLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        if(motorLift.getCurrentPosition() < LIFT_MOTOR_MAX_POSITION) {
+            motorLift.setPower(LIFTSPEED);
         } else {
-            motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motorLift.setPower(0);
         }
+
     }
 
     public void GrabberLiftLower() {
 
-
-        motorLift.setPower(-LIFTSPEED);
-        motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-       // boolean pressed = touchSensor.getState() != true;
-
-        // if the digital channel returns true it's HIGH and the button is unpressed.
-        if( motorLift.getCurrentPosition() > LIFT_MOTOR_TOLERANCE) {
-
-            motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        if(motorLift.getCurrentPosition() > 0) {
+            motorLift.setPower(-LIFTSPEED);
         } else {
-
-            motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            motorLift.setTargetPosition(0);
-
-            //GrabberLiftStop();
+            motorLift.setPower(0);
         }
+
     }
 
     public void GrabberLiftStop() {
-        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLift.setPower(0);
     }
 

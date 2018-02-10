@@ -36,9 +36,9 @@ public class Autonomous9533 extends LinearOpMode9533 {
     private static final long pauseTimeBetweenSteps = 100;
 
 
-    double NEW_P = 10.0;
-    double NEW_I = 0.05;
-    double NEW_D = 8.0;
+    double NEW_P = 10.0; // 10.0;
+    double NEW_I = 10.0; //0.05;
+    double NEW_D = 1; //8.0;
 
     double distanceToDrive = 0;
     int leftPosition;
@@ -72,6 +72,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
 
         updatePID();
 
+        final PIDCoefficients pidModified = robot.GetPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
 
         telemetry.addData("**** PLEASE WAIT FOR VUFORIA TO INIT ****", "");
 
@@ -80,6 +81,25 @@ public class Autonomous9533 extends LinearOpMode9533 {
         telemetry.addData("Park:", config.Park);
         telemetry.addData("Jewel:", config.JewelKnockOff);
         telemetry.addData("Crypto:", config.CryptoBox);
+
+        telemetry.addLine("P,I,D (modified)")
+                .addData("P", new Func<String>() {
+                    @Override public String value() {
+                        return String.format("%.04f", pidModified.p);
+                    }
+
+                }).addData("I", new Func<String>() {
+            @Override public String value() {
+                return String.format("%.04f", pidModified.i);
+            }
+
+        }).addData("D", new Func<String>() {
+            @Override public String value() {
+                return String.format("%.04f", pidModified.d);
+            }
+
+        });
+
 
         telemetry.update();
 
@@ -116,6 +136,10 @@ public class Autonomous9533 extends LinearOpMode9533 {
         PIDCoefficients pidNew = new PIDCoefficients(NEW_P, NEW_I, NEW_D);
         motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
         motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
+
+        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidNew);
+        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidNew);
+
     }
 
     void readPictograph() {
@@ -334,6 +358,22 @@ public class Autonomous9533 extends LinearOpMode9533 {
 
     }
 
+
+    void zeroLift() {
+
+        robot.setLiftToZero();
+        ElapsedTime lifttime = new ElapsedTime();
+
+
+        while (opModeIsActive() &&
+                (lifttime.seconds() < 1) &&
+                (robot.motorLift.isBusy())) {
+
+
+        }
+        robot.motorLift.setPower(0);
+    }
+
     void dropCryptoblock() {
 
 
@@ -345,7 +385,12 @@ public class Autonomous9533 extends LinearOpMode9533 {
         robot.GrabberLoose();
         updateStep("Finished drop block");
 
-        encoderLift(0.0);
+        //encoderLift(0.0);
+        zeroLift();
+
+        while(opModeIsActive() && robot.motorLift.isBusy() )
+
+
 //        updateStep("Lower block");
 //        robot.GrabberLiftLower();
 //        waitForTick(300);
@@ -374,6 +419,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
 //        }
 
     }
+
 
     void runProgramFront() {
 

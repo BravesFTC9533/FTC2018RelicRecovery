@@ -1,36 +1,23 @@
-package org.firstinspires.ftc.teamcode.RobotV2;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Func;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.teamcode.Autonomous9533;
-import org.firstinspires.ftc.teamcode.ComplicatedMecanumDrive;
-
-import org.firstinspires.ftc.teamcode.FtcGamePad;
-import org.firstinspires.ftc.teamcode.IDrive;
-import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.SimpleMenu;
+import org.firstinspires.ftc.teamcode.RobotV2.RobotV2;
 
 
 /**
  * Created by 9533 on 2/3/2018.
  */
-@TeleOp (name = "TeleOpV2", group = "Test")
-@Disabled
-public class TeleopV2 extends LinearOpMode  implements FtcGamePad.ButtonHandler {
+@TeleOp (name = "TeleOpTest", group = "Test")
+//@Disabled
+public class TeleopTest extends LinearOpMode9533  implements FtcGamePad.ButtonHandler {
 
-    RobotV2 robot;
-    protected FtcGamePad driverGamepad;
-    protected FtcGamePad operatorGamepad;
-    IDrive drive;
+
     PIDCoefficients pidOrigLeft;
     PIDCoefficients pidModified;
 
@@ -48,17 +35,17 @@ public class TeleopV2 extends LinearOpMode  implements FtcGamePad.ButtonHandler 
         operatorGamepad = new FtcGamePad("OperatorGamepad", gamepad2, this);
 
 
-        robot = new RobotV2(hardwareMap);
-        drive = new ComplicatedMecanumDrive(robot, driverGamepad);
+        robot = new Robot(hardwareMap);
+        robotDrive = new GTADrive(robot, driverGamepad);
 
         robot.SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
 
         menu.clearOptions();
-        menu.addOption("P", 40, 0, 0.01, NEW_P);
-        menu.addOption("I", 40, 0, 0.01, NEW_I);
-        menu.addOption("D", 40, 0, 0.01, NEW_D);
+        menu.addOption("P", 4000, 0, 0.01, NEW_P);
+        menu.addOption("I", 4000, 0, 0.01, NEW_I);
+        menu.addOption("D", 4000, 0, 0.01, NEW_D);
         menu.setGamepad(gamepad1);
         menu.setTelemetry(telemetry);
 
@@ -72,7 +59,7 @@ public class TeleopV2 extends LinearOpMode  implements FtcGamePad.ButtonHandler 
             pidModified = robot.GetPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
 
             driverGamepad.update();
-            drive.handle();
+            robotDrive.handle();
 
             menu.displayMenu();
 
@@ -84,6 +71,36 @@ public class TeleopV2 extends LinearOpMode  implements FtcGamePad.ButtonHandler 
         }
     }
 
+
+    void driveForward() {
+        robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        int lpos = robot.motorLeft.getCurrentPosition();
+        int rpos = robot.motorRight.getCurrentPosition();
+        double inches = 48;
+        int newLeftTarget = robot.motorLeft.getCurrentPosition() + (int)(inches * robot.REV_COUNTS_PER_INCH);
+        int newRightTarget = robot.motorRight.getCurrentPosition() + (int)(inches * robot.REV_COUNTS_PER_INCH);
+        robot.motorLeft.setTargetPosition(newLeftTarget);
+        robot.motorRight.setTargetPosition(newRightTarget);
+
+        while(opModeIsActive()){
+
+            lpos = robot.motorLeft.getCurrentPosition();
+            rpos = robot.motorRight.getCurrentPosition();
+
+            if(Math.abs(newLeftTarget - lpos) < 50){
+                robot.motorLeft.setPower(0);
+            }
+            if(Math.abs(newRightTarget - rpos) < 50){
+                robot.motorRight.setPower(0);
+            }
+
+            robot.setPower(1, 1);
+
+        }
+        robot.stop();
+
+
+    }
 
     DcMotor.RunMode _currentRunMode;
 
@@ -141,12 +158,14 @@ public class TeleopV2 extends LinearOpMode  implements FtcGamePad.ButtonHandler 
                 case FtcGamePad.GAMEPAD_A: //counter clockwise
                     if(pressed) {
 
+                        encoderDrive(1, 36, 36, 5);
                     }
                     break;
 
                 case FtcGamePad.GAMEPAD_B: //clockwise
                     if(pressed) {
 
+                        turn90(Autonomous9533.TurnDirection.COUNTERCLOCKWISE);
                     }
                     break;
 

@@ -45,11 +45,11 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
 
 
     public void turn90(Autonomous9533.TurnDirection direction) {
-        PIDCoefficients pidCurrent = motorExLeft.getPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
-        PIDCoefficients pidNew = new PIDCoefficients(1.0, 0, 0);
+//        PIDCoefficients pidCurrent = motorExLeft.getPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
+//        PIDCoefficients pidNew = new PIDCoefficients(1.0, 0, 0);
 
-        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
-        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
+//        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
+//        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
 
         double turn90Inches = (3.51 * 3.1415) * (313/robot.REV_COUNTS_PER_MOTOR_REV);
 
@@ -59,10 +59,10 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
         }
         updateStep("Turning 90 degrees");
 
-        encoderDriveBasic(1.0, -turn90Inches, turn90Inches, 10.0);
+        encoderDrive(0.5, -turn90Inches, turn90Inches, 10.0);
         updateStep("Finished turning 90 degrees");
-        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidCurrent);
-        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidCurrent);
+//        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidCurrent);
+//        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidCurrent);
 
     }
 
@@ -211,6 +211,9 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
             targetRight =robot.motorRight.getTargetPosition();
 
             currentLeft = robot.motorLeft.getCurrentPosition();
+
+            int scale = Math.abs(Math.abs(targetLeft) - Math.abs(currentLeft));
+
             //int newLeftTarget = currentLeft + (int)(leftInches * robot.COUNTS_PER_INCH);
 
             int distanceToMoveTicks = targetLeft - currentLeft;
@@ -228,6 +231,7 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
 
             int lastPosition = 0;
             double lastRuntime = 0;
+            double easein = 0;
 
             int slowdownTick = 150;
             // keep looping while we are still active, and there is time left, and both motors are running.
@@ -247,17 +251,19 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
                 if(accelerate) {
                     if (maxed) {
 
-                        if(differenceLeft < distanceToMoveTicks * .5) {
-                            currentSpeed = speed * .5;
-                        }
-
-
-//                        double newSpeed = 1 - (Easing.Interpolate(1 - (differenceLeft / scale), Easing.Functions.QuinticEaseIn));
-//
-//                        currentSpeed = speed * newSpeed;
-//                        if (currentSpeed < 0.4) {
-//                            currentSpeed = 0.4;
+//                        if(differenceLeft < distanceToMoveTicks * .5) {
+//                            currentSpeed = speed * .5;
 //                        }
+
+                        //1 - (1000/1000)
+
+                        easein = (Easing.Interpolate(1 - ((double)differenceLeft / (double)scale), Easing.Functions.CubicEaseIn));
+                        multiplier = 1 - easein;
+
+                        currentSpeed = speed * multiplier;
+                        if (currentSpeed < 0.4) {
+                            currentSpeed = 0.4;
+                        }
                     } else if (currentSpeed < speed) {
                         multiplier = Easing.Interpolate(runtime.seconds() * 4, Easing.Functions.CubicEaseOut);
                         currentSpeed = speed * multiplier;
@@ -267,10 +273,15 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
                     currentSpeed = speed;
                 }
 
+                telemetry.addLine()
+                        .addData("Scale", "%4d", scale)
+                        .addData("CL", "%4d", Math.abs(currentLeft))
+                        .addData("DL", "%4d", differenceLeft);
 
                 telemetry.addLine()
                         .addData("Multiplier", "%7f", multiplier)
-                        .addData("Speed", "%7f", currentSpeed);
+                        .addData("Speed", "%7f", currentSpeed)
+                        .addData("Ease", "%7f", easein);
 
                 //telemetry.update();
 
