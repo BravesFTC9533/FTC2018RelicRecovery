@@ -23,8 +23,43 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
     protected double fast_speed = 1.0;
     protected double turn_speed = 0.5;
 
+    protected double NEW_P = 10.0;
+    protected double NEW_I = 10.0;
+    protected double NEW_D = 1;
+
     DcMotorEx motorExLeft;
     DcMotorEx motorExRight;
+
+
+    protected  double Kp = 0.1;
+
+
+    void updatePID() {
+        PIDCoefficients pidNew = new PIDCoefficients(NEW_P, NEW_I, NEW_D);
+        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
+        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
+
+        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidNew);
+        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidNew);
+
+    }
+
+    protected void initialize() {
+
+        robot = new Robot(hardwareMap);
+        robot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.stop();
+
+        motorExLeft = (DcMotorEx)robot.motorLeft;
+        motorExRight = (DcMotorEx)robot.motorRight;
+
+
+        motorExLeft.setTargetPositionTolerance(2);
+        motorExRight.setTargetPositionTolerance(2);
+
+
+        updatePID();
+    }
 
 
     public void turn90(Autonomous9533.TurnDirection direction) {
@@ -110,10 +145,6 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
         boolean atMaxSpeed = false;
         ElapsedTime runtime = new ElapsedTime();
 
-        final double Kp = 0.1;
-//        final double Ki = 0.01;
-//        final double Kd = 0.01;
-
         double currentSpeed = 0;
         double minSpeed = 0.25;
 
@@ -133,7 +164,7 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
 
                 if(!atMaxSpeed) {
                     //accelerate until we reach our target speed
-                    currentSpeed = accelerate(0.25, currentSpeed, targetSpeed);
+                    currentSpeed = accelerate(0.25, runtime.seconds(), targetSpeed);
                     if(currentSpeed >= targetSpeed) {
                         currentSpeed = targetSpeed;
                         atMaxSpeed = true;
@@ -147,16 +178,21 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
                     }
                 }
 
-                //calculate error (has one wheel moved further than another)
-                int rightPos = (target.getRight() - current.getRight());
-                int leftPos = (target.getLeft() - current.getLeft());
-                error =  rightPos - leftPos;
+                double leftSpeed= currentSpeed;
+                double rightSpeed = currentSpeed;
 
-                //set left and right powers based on error (P loop)
-                //TODO: tweak Kp component
-                double leftSpeed = Range.clip(currentSpeed + (Kp*error), targetSpeed*-1, targetSpeed);
-                double rightSpeed = Range.clip(currentSpeed - (Kp*error), targetSpeed-1, targetSpeed);
+                if(Kp > 0) {
+                    //calculate error (has one wheel moved further than another)
+                    int rightPos = (target.getRight() - current.getRight());
+                    int leftPos = (target.getLeft() - current.getLeft());
+                    error = rightPos - leftPos;
 
+                    //set left and right powers based on error (P loop)
+                    //TODO: tweak Kp component
+                    leftSpeed = Range.clip(currentSpeed + (Kp * error), targetSpeed * -1, targetSpeed);
+                    rightSpeed = Range.clip(currentSpeed - (Kp * error), targetSpeed - 1, targetSpeed);
+
+                }
 
                 robot.setPower(leftSpeed, rightSpeed);
 
@@ -194,7 +230,7 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
     }
 
     public double decelerate(double percent, double currentSpeed) {
-        double multiplier = (Easing.Interpolate(percent, Easing.Functions.CubicEaseIn));
+        double multiplier = 1 - (Easing.Interpolate(percent, Easing.Functions.CubicEaseIn));
         return (currentSpeed * multiplier);
     }
 

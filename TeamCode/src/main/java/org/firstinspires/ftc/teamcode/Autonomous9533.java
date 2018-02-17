@@ -25,7 +25,7 @@ import java.util.Locale;
 public class Autonomous9533 extends LinearOpMode9533 {
 
 
-    //Robot robot = null;
+
     VuforiaHelper vuforiaHelper = null;
     Config config = null;
 
@@ -36,9 +36,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
     private static final long pauseTimeBetweenSteps = 100;
 
 
-    double NEW_P = 10.0; // 10.0;
-    double NEW_I = 10.0; //0.05;
-    double NEW_D = 1; //8.0;
+
 
     double distanceToDrive = 0;
     int leftPosition;
@@ -48,6 +46,8 @@ public class Autonomous9533 extends LinearOpMode9533 {
         CLOCKWISE,
         COUNTERCLOCKWISE
     }
+
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -62,15 +62,8 @@ public class Autonomous9533 extends LinearOpMode9533 {
 
         speed = config.speed;
 
+        initialize();
 
-        motorExLeft = (DcMotorEx)robot.motorLeft;
-        motorExRight = (DcMotorEx)robot.motorRight;
-
-
-        motorExLeft.setTargetPositionTolerance(2);
-        motorExRight.setTargetPositionTolerance(2);
-
-        updatePID();
 
         final PIDCoefficients pidModified = robot.GetPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -132,15 +125,7 @@ public class Autonomous9533 extends LinearOpMode9533 {
     }
 
 
-    void updatePID() {
-        PIDCoefficients pidNew = new PIDCoefficients(NEW_P, NEW_I, NEW_D);
-        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
-        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_TO_POSITION, pidNew);
 
-        motorExLeft.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidNew);
-        motorExRight.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidNew);
-
-    }
 
     void readPictograph() {
 
