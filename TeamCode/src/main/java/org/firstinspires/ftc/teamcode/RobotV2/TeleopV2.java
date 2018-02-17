@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.ComplicatedMecanumDrive;
 import org.firstinspires.ftc.teamcode.FtcGamePad;
 import org.firstinspires.ftc.teamcode.IDrive;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.SensorBNO055IMU;
 import org.firstinspires.ftc.teamcode.SimpleMenu;
 
 
@@ -47,9 +48,9 @@ public class TeleopV2 extends LinearOpMode  implements FtcGamePad.ButtonHandler 
         driverGamepad = new FtcGamePad("DriverGamepad", gamepad1, this);
         operatorGamepad = new FtcGamePad("OperatorGamepad", gamepad2, this);
 
-
         robot = new RobotV2(hardwareMap);
-        drive = new ComplicatedMecanumDrive(robot, driverGamepad);
+        //drive = new ComplicatedMecanumDrive(robot, driverGamepad);
+        drive = new ComplicatedMecanumDrive_B(robot, driverGamepad);
 
         robot.SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
