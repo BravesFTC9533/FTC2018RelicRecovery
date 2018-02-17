@@ -26,16 +26,16 @@ public class RobotV2 {
     public RobotV2(HardwareMap hardwareMap) {
         motorFrontLeft = hardwareMap.dcMotor.get("motorFrontLeft");
         motorFrontRight = hardwareMap.dcMotor.get("motorFrontRight");
-//        motorBackLeft = hardwareMap.dcMotor.get("motorBackLeft");
-//        motorBackRight = hardwareMap.dcMotor.get("motorBackRight");
+        motorBackLeft = hardwareMap.dcMotor.get("motorBackLeft");
+        motorBackRight = hardwareMap.dcMotor.get("motorBackRight");
 
         motorFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //
-//        motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -64,8 +64,8 @@ public class RobotV2 {
     public void SetMode(DcMotor.RunMode runMode) {
         motorFrontLeft.setMode(runMode);
         motorFrontRight.setMode(runMode);
-//        motorBackLeft.setMode(runMode);
-//        motorBackRight.setMode(runMode);
+        motorBackLeft.setMode(runMode);
+        motorBackRight.setMode(runMode);
     }
 
     public void SetPIDCoefficients(DcMotor.RunMode runMode, double new_p, double new_i, double new_d) {
@@ -73,8 +73,8 @@ public class RobotV2 {
 
         ((DcMotorEx)motorFrontLeft).setPIDCoefficients(runMode, new_pid);
         ((DcMotorEx)motorFrontRight).setPIDCoefficients(runMode, new_pid);
-//        ((DcMotorEx)motorBackLeft).setPIDCoefficients(runMode, new_pid);
-//        ((DcMotorEx)motorBackRight).setPIDCoefficients(runMode, new_pid);
+        ((DcMotorEx)motorBackLeft).setPIDCoefficients(runMode, new_pid);
+        ((DcMotorEx)motorBackRight).setPIDCoefficients(runMode, new_pid);
 
     }
     public PIDCoefficients GetPIDCoefficients(DcMotor.RunMode runMode) {
@@ -85,8 +85,8 @@ public class RobotV2 {
 
         motorFrontLeft.setPower(fl);
         motorFrontRight.setPower(fr);
-//        motorBackLeft.setPower(bl);
-//        motorBackRight.setPower(br);
+        motorBackLeft.setPower(bl);
+        motorBackRight.setPower(br);
 
     }
 
