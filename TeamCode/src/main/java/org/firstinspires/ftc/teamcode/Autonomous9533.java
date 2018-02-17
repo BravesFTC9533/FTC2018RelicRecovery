@@ -499,31 +499,12 @@ public class Autonomous9533 extends LinearOpMode9533 {
     }
 
 
-//
-//    public void encoderDrive(double speed,
-//                             double leftInches, double rightInches,
-//                             double timeoutS) {
-//        encoderDrive(speed, leftInches, rightInches, timeoutS, false);
-//    }
-//
 
 
 
 
     public void waitForTick(long periodMs) {
-
         sleep(periodMs);
-        // sleep for the remaining portion of the regular cycle period.
-//        if ( opModeIsActive()) {
-//            try {
-//                Thread.sleep(periodMs);
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//            }
-//        }
-
-        // Reset the cycle clock for the next pass.
-        //runtime.reset();
     }
 
     void composeTelemetry() {

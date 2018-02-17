@@ -197,8 +197,7 @@ public class PIDAutoTest extends LinearOpMode9533 {
             robot.motorRight.setTargetPosition(newRightTarget);
 
             // Turn On RUN_TO_POSITION
-            robot.motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.setRunToPosition();
 
             // reset the timeout time and start motion.
             runtime.reset();
@@ -224,15 +223,17 @@ public class PIDAutoTest extends LinearOpMode9533 {
                 telemetry.update();
             }
 
-            // Stop all motion;
-            robot.motorLeft.setPower(0);
-            robot.motorRight.setPower(0);
-
-            // Turn off RUN_TO_POSITION
-            robot.motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            //  sleep(250);   // optional pause after each move
+            robot.stop();
+            robot.setRunUsingEncoders();
+//            // Stop all motion;
+//            robot.motorLeft.setPower(0);
+//            robot.motorRight.setPower(0);
+//
+//            // Turn off RUN_TO_POSITION
+//            robot.motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//            robot.motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
+//            //  sleep(250);   // optional pause after each move
         }
     }
 

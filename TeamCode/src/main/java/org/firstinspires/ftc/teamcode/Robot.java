@@ -187,20 +187,27 @@ public class Robot {
         motorRight.setPower(right * 0.94);
 
     }
-    public void  setNewPosition(double leftInches, double rightInches) {
-        int newLeftTarget;
-        int newRightTarget;
 
+    public Pair<Integer, Integer> getCurrentPosition() {
+        return new Pair<>(motorLeft.getCurrentPosition(), motorRight.getCurrentPosition());
+    }
+    public Pair<Integer, Integer> calculateNewPositions(double leftInches, double rightInches){
+        int leftTarget = motorLeft.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+        int rightTarget = motorRight.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+        return new Pair<>(leftTarget, rightTarget);
+    }
 
-
-//        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        newLeftTarget = motorLeft.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
-        newRightTarget = motorRight.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
-        motorLeft.setTargetPosition(newLeftTarget);
-        motorRight.setTargetPosition(newRightTarget);
+    public Pair<Integer, Integer> setNewPosition(double inches) {
+        return setNewPosition(inches, inches);
+    }
+    public Pair<Integer, Integer> setNewPosition(double leftInches, double rightInches) {
+        Pair<Integer, Integer> target = calculateNewPositions(leftInches, rightInches);
+        motorLeft.setTargetPosition(target.getLeft());
+        motorRight.setTargetPosition(target.getRight());
 
         // Turn On RUN_TO_POSITION
-        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setRunToPosition();
+        return target;
     }
 
     public void setLiftToZero() {
@@ -216,6 +223,16 @@ public class Robot {
         motorLift.setTargetPosition(newTarget);
         motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+    }
+
+    public void setRunUsingEncoders(){
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+    public void setRunToPosition() {
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+    public void setRunWithoutEncoders() {
+        setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void setMode(DcMotor.RunMode mode) {
