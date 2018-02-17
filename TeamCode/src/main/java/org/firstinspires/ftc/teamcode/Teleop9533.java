@@ -107,14 +107,14 @@ public class Teleop9533 extends LinearOpMode9533 implements FtcGamePad.ButtonHan
             case FtcGamePad.GAMEPAD_A: //counter clockwise
                 if(pressed) {
 
-                    turn90slow(Autonomous9533.TurnDirection.CLOCKWISE);
+                    //turn90slow(Autonomous9533.TurnDirection.CLOCKWISE);
                 }
                 break;
 
             case FtcGamePad.GAMEPAD_B: //clockwise
                 if(pressed) {
 
-                    turn90slow(Autonomous9533.TurnDirection.COUNTERCLOCKWISE);
+                    //turn90slow(Autonomous9533.TurnDirection.COUNTERCLOCKWISE);
                 }
                 break;
 
@@ -260,6 +260,8 @@ public class Teleop9533 extends LinearOpMode9533 implements FtcGamePad.ButtonHan
         robot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         parking = false;
     }
+
+
 
 
 
