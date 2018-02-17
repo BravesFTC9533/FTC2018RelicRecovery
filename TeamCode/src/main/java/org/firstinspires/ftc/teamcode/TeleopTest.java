@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.RobotV2.RobotV2;
  * Created by 9533 on 2/3/2018.
  */
 @TeleOp (name = "TeleOpTest", group = "Test")
-//@Disabled
+@Disabled
 public class TeleopTest extends LinearOpMode9533  implements FtcGamePad.ButtonHandler {
 
 

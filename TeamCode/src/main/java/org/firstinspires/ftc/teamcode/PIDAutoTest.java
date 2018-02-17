@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
  * Created by dmill on 2/3/2018.
  */
 @Autonomous(name = "PID Auto Test", group = "Testing")
+@Disabled
 public class PIDAutoTest extends LinearOpMode9533 {
 
 
