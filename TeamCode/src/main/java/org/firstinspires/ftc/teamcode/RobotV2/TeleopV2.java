@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.SimpleMenu;
  * Created by 9533 on 2/3/2018.
  */
 @TeleOp (name = "TeleOpV2", group = "Test")
-@Disabled
+//@Disabled
 public class TeleopV2 extends LinearOpMode  implements FtcGamePad.ButtonHandler {
 
     RobotV2 robot;
@@ -74,6 +74,7 @@ public class TeleopV2 extends LinearOpMode  implements FtcGamePad.ButtonHandler 
 
             driverGamepad.update();
             drive.handle();
+            
 
             menu.displayMenu();
 

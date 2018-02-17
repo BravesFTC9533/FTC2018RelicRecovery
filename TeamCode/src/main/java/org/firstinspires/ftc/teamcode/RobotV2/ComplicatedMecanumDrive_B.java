@@ -40,6 +40,8 @@ public class ComplicatedMecanumDrive_B implements IDrive {
     @Override
     public void handle() {
 
+        fieldDrive();
+        /*
         double leftX = driverGamepad.getLeftStickX();
         double leftY = -driverGamepad.getLeftStickY();
         double rightX = driverGamepad.getRightStickX();
@@ -54,7 +56,7 @@ public class ComplicatedMecanumDrive_B implements IDrive {
         final double v4 = r * Math.cos(robotAngle) - rightX;
 
         robot.Drive(v1, v2, v3, v4);
-
+        */
 
     }
 
@@ -64,17 +66,16 @@ public class ComplicatedMecanumDrive_B implements IDrive {
         double rotation = driverGamepad.getRightStickX();
 
         Orientation angles;
-
         angles   = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         double gyroDegrees = angles.firstAngle;
         double gyroRadians = gyroDegrees * (Math.PI/180);
 
-        double r = Math.hypot(forward, strafe);
-
         double temp = forward * Math.cos(gyroRadians) + strafe * Math.sin(gyroRadians);
         strafe = -forward * Math.sin(gyroRadians) + strafe * Math.cos(gyroRadians);
         forward = temp;
+
+        double r = Math.hypot(forward, strafe);
 
         final double v1 = r * Math.cos(gyroRadians) + rotation;
         final double v2 = r * Math.sin(gyroRadians) - rotation;
