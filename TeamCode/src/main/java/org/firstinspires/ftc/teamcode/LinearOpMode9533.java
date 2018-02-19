@@ -178,7 +178,7 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
                     }
                 }
 
-                double leftSpeed= currentSpeed;
+                double leftSpeed = currentSpeed;
                 double rightSpeed = currentSpeed;
 
                 if(Kp > 0) {
@@ -188,7 +188,6 @@ public abstract class LinearOpMode9533 extends LinearOpMode {
                     error = rightPos - leftPos;
 
                     //set left and right powers based on error (P loop)
-                    //TODO: tweak Kp component
                     leftSpeed = Range.clip(currentSpeed + (Kp * error), targetSpeed * -1, targetSpeed);
                     rightSpeed = Range.clip(currentSpeed - (Kp * error), targetSpeed - 1, targetSpeed);
 

@@ -38,17 +38,22 @@ public class ComplicatedMecanumDrive implements IDrive {
         double leftY = -driverGamepad.getLeftStickY();
         double rightX = driverGamepad.getRightStickX();
 
-        double r = Math.hypot(leftX, leftY);
+        drive(leftY, leftX, rightX);
 
-        double robotAngle = Math.atan2(leftY, leftX) - Math.PI / 4;
 
-        final double v1 = r * Math.cos(robotAngle) + rightX;
-        final double v2 = r * Math.sin(robotAngle) - rightX;
-        final double v3 = r * Math.sin(robotAngle) + rightX;
-        final double v4 = r * Math.cos(robotAngle) - rightX;
+    }
+
+    @Override
+    public void drive(double ly, double lx, double rx) {
+        double r = Math.hypot(lx, ly);
+
+        double robotAngle = Math.atan2(ly, lx) - Math.PI / 4;
+
+        final double v1 = r * Math.cos(robotAngle) + rx;
+        final double v2 = r * Math.sin(robotAngle) - rx;
+        final double v3 = r * Math.sin(robotAngle) + rx;
+        final double v4 = r * Math.cos(robotAngle) - rx;
 
         robot.Drive(v1, v2, v3, v4);
-
-
     }
 }

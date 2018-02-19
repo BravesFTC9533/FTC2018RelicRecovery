@@ -157,7 +157,10 @@ public class SimpleMenu {
     {
         this.options.add(new Option(option, max, min, inc, start));
     }
-
+    public void addOption(String option, int max, int min, int inc, double start)
+    {
+        this.options.add(new Option(option, max, min, inc, start));
+    }
     public String getCurrentChoiceOf(String option) {
         for (Option o : this.options) {
             if (!o.getName().equals(option)) continue;

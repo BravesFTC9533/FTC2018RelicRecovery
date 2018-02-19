@@ -57,6 +57,11 @@ class GTADrive implements IDrive {
 
     }
 
+    @Override
+    public void drive(double ly, double lx, double rx) {
+
+    }
+
     private DriveDir getDir(double dir) {
         if(dir <= -0.7) {
             return DriveDir.HARD_LEFT;
@@ -204,6 +209,11 @@ class GTADrive2 implements IDrive {
             drive(finalLeft, finalRight);
         }
 
+
+    }
+
+    @Override
+    public void drive(double ly, double lx, double rx) {
 
     }
 

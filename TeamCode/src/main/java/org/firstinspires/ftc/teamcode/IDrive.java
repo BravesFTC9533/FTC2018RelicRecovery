@@ -9,4 +9,6 @@ public interface IDrive {
     boolean getIsReverse();
     void setIsReverse(boolean value);
     void handle();
+
+    void drive(double ly, double lx, double rx);
 }

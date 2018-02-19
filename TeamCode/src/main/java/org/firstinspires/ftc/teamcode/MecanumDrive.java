@@ -37,8 +37,8 @@ public class MecanumDrive implements IDrive {
         double h, v, r;
 
         h = -driverGamepad.getLeftStickX();
-        v = -driverGamepad.getLeftStickY();
-        r = -driverGamepad.getRightStickX();
+        v = driverGamepad.getLeftStickY();
+        r = driverGamepad.getRightStickX();
 
 
         if(Math.abs(h) < MIN_SPEED) {
@@ -88,6 +88,11 @@ public class MecanumDrive implements IDrive {
 
         robot.Drive(frontLeft, frontRight, backLeft, backRight);
 
+
+    }
+
+    @Override
+    public void drive(double ly, double lx, double rx) {
 
     }
 
