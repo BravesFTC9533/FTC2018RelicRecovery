@@ -38,8 +38,20 @@ public class ComplicatedMecanumDrive_B implements IDrive {
 
     public enum DriveModes
     {
-        FIELD,
-        ROBOT
+        FIELD ("Field oriented"),
+        ROBOT ("Robot oriented");
+
+        private final String name;
+        DriveModes(String s) {
+            name = s;
+        }
+
+        public boolean equalsName(String otherName) {
+            return name.equals(otherName);
+        }
+        public String toString() {
+            return  this.name;
+        }
     }
 
     public DriveModes getDriveMode() {
@@ -47,6 +59,10 @@ public class ComplicatedMecanumDrive_B implements IDrive {
     }
     public void setDriveMode(DriveModes driveMode) {
         this.driveMode = driveMode;
+    }
+
+    public void toggleDriveMode(){
+        this.driveMode = (this.driveMode == DriveModes.FIELD) ? DriveModes.ROBOT : DriveModes.FIELD;
     }
 
     @Override

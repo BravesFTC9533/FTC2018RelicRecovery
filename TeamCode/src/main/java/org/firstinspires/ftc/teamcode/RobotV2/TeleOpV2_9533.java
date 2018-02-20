@@ -26,22 +26,24 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
 
     public static int ticks = 200;
 
-
-    boolean flipperButtonPressed = false;
-
-    boolean liftDownPressed = false;
-    boolean liftUpPressed = false;
-
-    double lastFlipperFloop = 0;
-
-
+    BlockLift blockLift = null;
+    BlockTray blockTray = null;
     ElapsedTime runtime = new ElapsedTime();
 
-    ArrayList<Integer> positions;// = robot.getPositions();
+
+    //<editor-fold desc="Telemetry variables">
+    Orientation angles;
+    ComplicatedMecanumDrive_B.DriveModes currentDriveMode;
+    //</editor-fold>
+
+
     @Override
     public void runOpMode() throws InterruptedException {
 
         initialize();
+
+        blockLift = new BlockLift(robot);
+        blockTray = new BlockTray(robot);
 
 
 //        menu.clearOptions();
@@ -66,9 +68,8 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
             updateGamepads();
             robotDrive.handle();
 
-            handleFlipper();
-
-            handleLift();
+            blockLift.loop(runtime);
+            blockTray.loop(runtime);
 
             telemetry.update();
 
@@ -77,112 +78,31 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
 
     }
 
-    private  void handleLift() {
-        if(liftDownPressed){
-            if(robot.touchSensorPressed()) {
-                robot.stopLift();
-            } else {
-                robot.lowerLift();
-            }
-        } else if(liftUpPressed) {
-            robot.raiseLift();
-        } else {
-            robot.stopLift();
-        }
-    }
-
-    private void handleFlipper() {
-        if(flipperButtonPressed) {
-
-            boolean shouldIncrement = lastFlipperFloop == 0 || runtime.milliseconds() >= lastFlipperFloop + robot.servoDelayDelta;
-            if(shouldIncrement) {
-                robot.incrementBlockFlipperServo();
-                lastFlipperFloop = runtime.milliseconds();
-            }
-
-        } else {
-            boolean shouldDecrement = lastFlipperFloop == 0 || runtime.milliseconds() >= lastFlipperFloop + robot.servoDelayDelta;
-            if(shouldDecrement) {
-                robot.closeBlockFlipperServo();
-                lastFlipperFloop = runtime.milliseconds();
-            }
-
-        }
-    }
-
-
-    Orientation angles;
 
     private void ComposeTelemetry() {
 
         telemetry.addAction(new Runnable() { @Override public void run()
         {
-            // Acquiring the angles is relatively expensive; we don't want
-            // to do that in each of the three items that need that info, as that's
-            // three times the necessary expense.
-
-            angles   = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            positions = robot.getPositions();
+            angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            currentDriveMode = ((ComplicatedMecanumDrive_B)robotDrive).getDriveMode();
         }
         });
 
         telemetry.addLine()
-                .addData("Runtime", new Func<String>() {
+                .addData("Orientation", new Func<String>() {
+                            @Override
+                            public String value() {
+                                return currentDriveMode.toString();
+                            }
+                        })
+                .addData("Drive Mode", new Func<String>() {
                     @Override
                     public String value() {
-                        return String.format("%f", runtime.milliseconds());
-                    }
-                })
-                .addData("Last", new Func<String>() {
-                    @Override
-                    public String value() {
-                        return String.format("%f", lastFlipperFloop);
-                    }
-                })
-                .addData("Servo", new Func<String>() {
-                    @Override
-                    public String value() {
-                        return formatDegrees(robot.getServoPosition());
+                        return robotDrive.getIsReverse() ? "Reverse" : "Normal";
                     }
                 });
 
-        telemetry.addLine("Positions")
-                .addData("FL", new Func<String>() {
-                    @Override public String value() {
-                        return positions.get(0).toString();
-                    }
-                })
-                .addData("FR", new Func<String>() {
-                    @Override public String value() {
-                        return positions.get(1).toString();
-                    }
-                })
-                .addData("RL", new Func<String>() {
-                    @Override public String value() {
-                        return positions.get(2).toString();
-                    }
-                })
-                .addData("RR", new Func<String>() {
-                    @Override public String value() {
-                        return positions.get(3).toString();
-                    }
-                });
-        telemetry.addLine()
-                .addData("heading", new Func<String>() {
-                    @Override public String value() {
-                        return formatAngle(angles.angleUnit, angles.firstAngle);
-                    }
-                })
-                .addData("roll", new Func<String>() {
-                    @Override public String value() {
-                        return formatAngle(angles.angleUnit, angles.secondAngle);
-                    }
-                })
-                .addData("pitch", new Func<String>() {
-                    @Override public String value() {
-                        return formatAngle(angles.angleUnit, angles.thirdAngle);
-                    }
-                });
+
     }
 
 
@@ -190,11 +110,9 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
     String formatAngle(AngleUnit angleUnit, double angle) {
         return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
     }
-
     String formatDegrees(double degrees){
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
-
     String formatDouble(double value) {
         return  String.format(Locale.getDefault(), "%.2f", value);
     }
@@ -209,14 +127,14 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
 
         switch (button) {
             case FtcGamePad.GAMEPAD_A:
-
                 break;
             case FtcGamePad.GAMEPAD_B:
-
-
+                if(pressed) {
+                    ((ComplicatedMecanumDrive_B) robotDrive).toggleDriveMode();
+                }
                 break;
             case FtcGamePad.GAMEPAD_X:
-
+                robotDrive.setIsReverse(!robotDrive.getIsReverse());
                 break;
             case FtcGamePad.GAMEPAD_Y:
                 break;
@@ -230,19 +148,19 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
                 break;
             case FtcGamePad.GAMEPAD_LBUMPER:
                 if(pressed) {
-                    turn90(TurnDirection.COUNTERCLOCKWISE, ticks);
+                    //turn90(TurnDirection.COUNTERCLOCKWISE, ticks);
                 }
                 break;
             case FtcGamePad.GAMEPAD_RBUMPER:
                 if(pressed) {
-                    turn90(TurnDirection.CLOCKWISE, ticks);
+                    //turn90(TurnDirection.CLOCKWISE, ticks);
                 }
 
                 //this.robotDrive.setIsReverse(!this.robotDrive.getIsReverse());
                 break;
             case FtcGamePad.GAMEPAD_START:
-                robot.SetMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                robot.SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//                robot.SetMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                robot.SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 break;
         }
     }
@@ -252,7 +170,8 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
 
         switch (button) {
             case FtcGamePad.GAMEPAD_A:
-                liftDownPressed = pressed;
+                //liftDownPressed = pressed;
+                blockLift.setLowerLiftButtonPressed(pressed);
                 break;
             case FtcGamePad.GAMEPAD_B:
 
@@ -260,7 +179,8 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
             case FtcGamePad.GAMEPAD_X:
                 break;
             case FtcGamePad.GAMEPAD_Y:
-                liftUpPressed = pressed;
+                //liftUpPressed = pressed;
+                blockLift.setRaiseLiftButtonPressed(pressed);
 
                 break;
             case FtcGamePad.GAMEPAD_DPAD_DOWN:
@@ -274,8 +194,8 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
             case FtcGamePad.GAMEPAD_LBUMPER:
                 break;
             case FtcGamePad.GAMEPAD_RBUMPER:
-                flipperButtonPressed = pressed;
-
+                //flipperButtonPressed = pressed;
+                blockTray.setOpenTrayButtonPressed(pressed);
                 break;
             case FtcGamePad.GAMEPAD_START:
                 break;

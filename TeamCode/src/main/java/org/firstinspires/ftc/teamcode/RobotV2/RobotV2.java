@@ -30,16 +30,13 @@ public class RobotV2 {
     public DcMotorEx motorBackLeft = null;
     public DcMotorEx motorBackRight = null;
 
-    public DcMotor motorLift = null;
+    public DcMotorEx motorLift = null;
 
     public Servo flipperServoLeft = null;
     public Servo flipperServoRight = null;
 
 
     public DigitalChannel touchSensor = null;
-
-    public double MIN_SERVO = 0.3;
-    public double LIFT_POWER = 1;
 
     public BNO055IMU imu = null;
 
@@ -51,39 +48,44 @@ public class RobotV2 {
 
 
 
+    private final HardwareMap hardwareMap;
+
+    private DcMotorEx createMotor(String deviceName, boolean setReverse) {
+        DcMotorEx motor = hardwareMap.get(DcMotorEx.class, deviceName);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        if(setReverse)
+        {
+            motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
+        return motor;
+    }
+
     public RobotV2(HardwareMap hardwareMap) {
-        motorFrontLeft =  (DcMotorEx)hardwareMap.dcMotor.get("motorFrontLeft");
-        motorFrontRight = (DcMotorEx)hardwareMap.dcMotor.get("motorFrontRight");
-        motorBackLeft =   (DcMotorEx)hardwareMap.dcMotor.get("motorBackLeft");
-        motorBackRight =  (DcMotorEx)hardwareMap.dcMotor.get("motorBackRight");
 
+        this.hardwareMap = hardwareMap;
 
-        motorFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //region Drive Motors
 
-        motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorFrontLeft  = createMotor("motorFrontLeft", true);
+        motorFrontRight = createMotor("motorFrontRight", false);
+        motorBackLeft   = createMotor("motorBackLeft", true);
+        motorBackRight  = createMotor("motorBackRight", false);
+        //endregion
 
-
-        motorLift = hardwareMap.get(DcMotor.class, "liftMotor");
-        motorLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorLift.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        motorLift = createMotor("liftMotor", true);
 
         flipperServoLeft = hardwareMap.get(Servo.class, "flipperServoLeft");
         flipperServoRight = hardwareMap.get(Servo.class, "flipperServoRight");
         flipperServoRight.setDirection(Servo.Direction.REVERSE);
 
-
         touchSensor = hardwareMap.get(DigitalChannel.class, "touchSensor");
         touchSensor.setMode(DigitalChannel.Mode.INPUT);
 
+        setupIMU(hardwareMap);
 
-        //SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
 
-
+    void setupIMU(HardwareMap hardwareMap) {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -97,8 +99,6 @@ public class RobotV2 {
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-
-
     }
 
     void updatePID(double p, double i, double d) {
@@ -234,53 +234,6 @@ public class RobotV2 {
 
 
 
-    public void closeBlockFlipperServo() {
-        servoPosition -= servoDelta;
 
-        if(servoPosition < MIN_SERVO) {
-            servoPosition = MIN_SERVO;
-        }
-
-        setBlockFlipperServoPosition(servoPosition);
-    }
-
-    private void setBlockFlipperServoPosition(double position) {
-        flipperServoLeft.setPosition(position);
-        flipperServoRight.setPosition(position);
-    }
-
-    static final double servoDelta = 0.02;
-    public static double servoDelayDelta = 1000/100;
-
-    public double servoPosition = MIN_SERVO;
-
-
-    public void incrementBlockFlipperServo() {
-        servoPosition += servoDelta;
-        if(servoPosition > 1) {
-            servoPosition = 1;
-        }
-        setBlockFlipperServoPosition(servoPosition);
-
-    }
-
-    public double getServoPosition() {
-        return  servoPosition;
-    }
-
-
-    public void raiseLift() {
-        motorLift.setPower(LIFT_POWER);
-    }
-    public void stopLift() {
-        motorLift.setPower(0);
-    }
-    public void lowerLift() {
-        motorLift.setPower(-LIFT_POWER);
-    }
-
-    public boolean touchSensorPressed() {
-        return  !(touchSensor.getState() == true);
-    }
 
 }
