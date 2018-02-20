@@ -73,6 +73,8 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
             blockLift.loop(runtime);
             blockTray.loop(runtime);
 
+            //TODO: do not allow intake to run while tray is open
+
             telemetry.update();
 
         }
