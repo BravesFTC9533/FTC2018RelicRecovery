@@ -47,6 +47,10 @@ public abstract class LinearOpModeV2_9533 extends LinearOpMode implements FtcGam
         operatorGamepad = new FtcGamePad("OperatorGamepad", gamepad2, this);
 
         this.robotDrive = getRobotDrive(robot, driverGamepad);
+
+        robot.updatePID(10, 10, 1);
+        robot.SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
 
 

@@ -34,6 +34,7 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
     //<editor-fold desc="Telemetry variables">
     Orientation angles;
     ComplicatedMecanumDrive_B.DriveModes currentDriveMode;
+    boolean usingEncoder = true;
     //</editor-fold>
 
 
@@ -45,25 +46,26 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
         blockLift = new BlockLift(robot);
         blockTray = new BlockTray(robot);
 
+        telemetry.addData("*** Driver Controls ***", "");
+        telemetry.addData("[B] Toggle Field/Robot Orientation", "");
+        telemetry.addData("[X] Toggle Normal/Reverse drive", "");
+        telemetry.addData("[Y] Toggle Encoder drive", "");
 
-//        menu.clearOptions();
-//        menu.addOption("Ticks", 250, 150, 1, ticks);
-//
-//        menu.setGamepad(gamepad1);
-//        menu.setTelemetry(telemetry);
+        telemetry.addData("*** Operator Controls ***", "");
+        telemetry.addData("[A] Lower lift", "");
+        telemetry.addData("[Y] Raise lift", "");
+        telemetry.addData("[RB] Open Block Tray", "");
 
-        ComposeTelemetry();
+        telemetry.update();
 
         waitForStart();
 
-        robot.updatePID(10, 10, 1);
-        robot.SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        ComposeTelemetry();
+
 
         runtime.reset();
         while(opModeIsActive()) {
-
-//            menu.displayMenu();
-//            ticks = (int)Double.parseDouble(menu.getCurrentChoiceOf("Ticks"));
 
             updateGamepads();
             robotDrive.handle();
@@ -72,7 +74,6 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
             blockTray.loop(runtime);
 
             telemetry.update();
-
 
         }
 
@@ -85,6 +86,7 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
         {
             angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             currentDriveMode = ((ComplicatedMecanumDrive_B)robotDrive).getDriveMode();
+            usingEncoder = robot.GetMode() == DcMotor.RunMode.RUN_USING_ENCODER;
         }
         });
 
@@ -94,11 +96,19 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
                             public String value() {
                                 return currentDriveMode.toString();
                             }
-                        })
+                        });
+        telemetry.addLine()
                 .addData("Drive Mode", new Func<String>() {
                     @Override
                     public String value() {
                         return robotDrive.getIsReverse() ? "Reverse" : "Normal";
+                    }
+                });
+        telemetry.addLine()
+                .addData("Using Encoders?", new Func<String>() {
+                    @Override
+                    public String value() {
+                        return usingEncoder ? "Yes" : "No";
                     }
                 });
 
@@ -134,9 +144,21 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
                 }
                 break;
             case FtcGamePad.GAMEPAD_X:
-                robotDrive.setIsReverse(!robotDrive.getIsReverse());
+                if(pressed) {
+                    robotDrive.setIsReverse(!robotDrive.getIsReverse());
+                }
                 break;
             case FtcGamePad.GAMEPAD_Y:
+                if(pressed) {
+                    switch (robot.GetMode()){
+                        case RUN_USING_ENCODER:
+                            robot.SetMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                            break;
+                        case RUN_WITHOUT_ENCODER:
+                            robot.SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                            break;
+                    }
+                }
                 break;
             case FtcGamePad.GAMEPAD_DPAD_DOWN:
                 break;
@@ -174,6 +196,7 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
                 blockLift.setLowerLiftButtonPressed(pressed);
                 break;
             case FtcGamePad.GAMEPAD_B:
+
 
                 break;
             case FtcGamePad.GAMEPAD_X:
