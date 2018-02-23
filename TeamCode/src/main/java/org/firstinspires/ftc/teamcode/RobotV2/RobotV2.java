@@ -32,6 +32,9 @@ public class RobotV2 {
 
     public DcMotorEx motorLift = null;
 
+    public DcMotorEx intakeMotorLeft = null;
+    public DcMotorEx intakeMotorRight = null;
+
     public Servo flipperServoLeft = null;
     public Servo flipperServoRight = null;
 
@@ -71,6 +74,9 @@ public class RobotV2 {
         motorBackLeft   = createMotor("motorBackLeft", true);
         motorBackRight  = createMotor("motorBackRight", false);
         //endregion
+
+        intakeMotorLeft = createMotor("intakeMotorLeft", true);
+        intakeMotorRight = createMotor("intakeMotorRight", false);
 
         motorLift = createMotor("liftMotor", true);
 

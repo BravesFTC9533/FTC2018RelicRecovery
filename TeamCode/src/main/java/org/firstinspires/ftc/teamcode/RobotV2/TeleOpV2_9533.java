@@ -28,8 +28,8 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
 
     BlockLift blockLift = null;
     BlockTray blockTray = null;
+    IntakeMotor intakeMotor = null;
     ElapsedTime runtime = new ElapsedTime();
-
 
     //<editor-fold desc="Telemetry variables">
     Orientation angles;
@@ -45,6 +45,8 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
 
         blockLift = new BlockLift(robot);
         blockTray = new BlockTray(robot);
+
+        intakeMotor = new IntakeMotor(robot, operatorGamepad);
 
         telemetry.addData("*** Driver Controls ***", "");
         telemetry.addData("[B] Toggle Field/Robot Orientation", "");
@@ -72,6 +74,7 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
 
             blockLift.loop(runtime);
             blockTray.loop(runtime);
+            intakeMotor.loop(runtime);
 
             //TODO: do not allow intake to run while tray is open
 
