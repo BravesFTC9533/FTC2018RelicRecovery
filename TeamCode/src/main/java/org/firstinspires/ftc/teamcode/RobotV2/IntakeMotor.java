@@ -18,24 +18,23 @@ public class IntakeMotor implements ILoopable {
 
     private FtcGamePad operatorGamepad = null;
 
+    double currentSpeed = 0;
     public IntakeMotor(RobotV2 robot, FtcGamePad operaterGamepad){
         this.robot = robot;
         this.intakeMotorLeft = robot.intakeMotorLeft;
         this.intakeMotorRight = robot.intakeMotorRight;
         this.operatorGamepad = operaterGamepad;
     }
-    
-    double pullSpeed = operatorGamepad.getRightTrigger();
-    double spitSpeed = operatorGamepad.getLeftTrigger();
+
+    double pullSpeed;
+    double spitSpeed;
 
     @Override
     public void loop(ElapsedTime runTime) {
-        if(operatorGamepad.getRightTrigger() > 0) {
-            pullBlock();
-        }
-        if(operatorGamepad.getLeftTrigger() > 0){
-            spitBlock();
-        }
+
+        currentSpeed = operatorGamepad.getRightTrigger() - operatorGamepad.getLeftTrigger();
+        setPower(currentSpeed);
+
     }
 
     @Override
@@ -43,14 +42,19 @@ public class IntakeMotor implements ILoopable {
         stopIntake();
     }
 
-    public void pullBlock(){
-        intakeMotorLeft.setPower(pullSpeed);
-        intakeMotorRight.setPower(pullSpeed);
+    public double getCurrentSpeed() {
+        return currentSpeed;
+    }
+    public void setPower(double power){
+        intakeMotorLeft.setPower(power);
+        intakeMotorRight.setPower(power);
     }
 
-    public void spitBlock(){
-        intakeMotorLeft.setPower(-spitSpeed);
-        intakeMotorRight.setPower(-spitSpeed);
+    public int getLeftTicks() {
+        return intakeMotorLeft.getCurrentPosition();
+    }
+    public int getRightTicks() {
+        return intakeMotorRight.getCurrentPosition();
     }
 
 

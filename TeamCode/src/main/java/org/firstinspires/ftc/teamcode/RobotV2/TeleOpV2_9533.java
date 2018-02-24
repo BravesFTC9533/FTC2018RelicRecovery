@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.internal.webserver.FtcUserAgentCategory;
 import org.firstinspires.ftc.teamcode.FtcGamePad;
 import org.firstinspires.ftc.teamcode.IDrive;
 import org.firstinspires.ftc.teamcode.SimpleMenu;
@@ -57,6 +58,8 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
         telemetry.addData("[A] Lower lift", "");
         telemetry.addData("[Y] Raise lift", "");
         telemetry.addData("[RB] Open Block Tray", "");
+        telemetry.addData("[LT] Spit out block", "");
+        telemetry.addData("[RT] Pull in block", "");
 
         telemetry.update();
 
@@ -116,6 +119,26 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
                         return usingEncoder ? "Yes" : "No";
                     }
                 });
+        telemetry.addLine()
+                .addData("Intake speed", new Func<String>() {
+                    @Override
+                    public String value() {
+                        return formatDouble(intakeMotor.currentSpeed);
+                    }
+                })
+                .addData("L", new Func<String>() {
+                    @Override
+                    public String value() {
+                        return formatInt(intakeMotor.getLeftTicks());
+                    }
+                })
+                .addData("R", new Func<String>() {
+                    @Override
+                    public String value() {
+                        return formatInt(intakeMotor.getRightTicks());
+                    }
+                });
+
 
 
     }
@@ -127,6 +150,10 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
     }
     String formatDegrees(double degrees){
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
+    }
+
+    String formatInt(int value) {
+        return String.format(Locale.getDefault(), "%d", value);
     }
     String formatDouble(double value) {
         return  String.format(Locale.getDefault(), "%.2f", value);
@@ -155,14 +182,21 @@ public class TeleOpV2_9533 extends LinearOpModeV2_9533 {
                 break;
             case FtcGamePad.GAMEPAD_Y:
                 if(pressed) {
-                    switch (robot.GetMode()){
-                        case RUN_USING_ENCODER:
-                            robot.SetMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                            break;
-                        case RUN_WITHOUT_ENCODER:
-                            robot.SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                            break;
+
+                    if(usingEncoder){
+                        robot.SetMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    } else {
+                        robot.SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     }
+
+//                    switch (robot.GetMode()){
+//                        case RUN_USING_ENCODER:
+//                            robot.SetMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//                            break;
+//                        case RUN_WITHOUT_ENCODER:
+//                            robot.SetMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//                            break;
+//                    }
                 }
                 break;
             case FtcGamePad.GAMEPAD_DPAD_DOWN:
