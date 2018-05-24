@@ -24,7 +24,7 @@ public class IntakeMotor implements ILoopable {
         this.intakeMotorRight = robot.intakeMotorRight;
         this.operatorGamepad = operaterGamepad;
     }
-    
+
     double pullSpeed = operatorGamepad.getRightTrigger();
     double spitSpeed = operatorGamepad.getLeftTrigger();
 
